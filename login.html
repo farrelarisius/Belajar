@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> Halaman Login | Resep Keluarga</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="kartu">
+
+    <!-- Kiri: form login -->
+    <section class="form-panel">
+      <h1>Login</h1>
+      <p class="sub">Masuk untuk melihat resep dan menu kamu</p>
+
+      <form id="formLogin" novalidate>
+        <div class="field">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" autocomplete="username">
+          <div class="pesan-error"></div>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <input type="password" id="password" name="password" autocomplete="current-password">
+            <button type="button" class="toggle-pw" data-target="password">Lihat</button>
+          </div>
+          <div class="pesan-error"></div>
+        </div>
+
+        <button type="submit" class="tombol">Login</button>
+        <div class="notif" id="notif" role="status"></div>
+      </form>
+
+      <p class="alihan">Belum punya akun? <a href="form.html">Daftar</a></p>
+    </section>
+
+    <!-- Kanan: sambutan -->
+    <section class="sambutan kanan">
+      <div class="logo"><img src="Polibatam Univ Logo baru .png" width="150px" height="150px"></div>
+
+      <div class="slide-area">
+        <div class="slide aktif">
+          <h2>Selamat Datang Kembali</h2>
+          <p>Aplikasi Resep dan Menu Masakan Keluarga</p>
+          <p class="tebal">Mau Makan Apa Hari Ini?</p>
+        </div>
+        <div class="slide">
+          <h2>Resep Sudah Menunggu</h2>
+          <p class="tebal">Lanjutkan memasak dari resep terakhir kamu.</p>
+        </div>
+        <div class="slide">
+          <h2>Menu Minggu Ini</h2>
+          <p class="tebal">Cek menu favorit kamu.</p>
+        </div>
+      </div>
+
+      <div class="dots" role="tablist" aria-label="Slide sambutan">
+        <button class="dot aktif" aria-label="Slide 1"></button>
+        <button class="dot" aria-label="Slide 2"></button>
+        <button class="dot" aria-label="Slide 3"></button>
+      </div>
+    </section>
+
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

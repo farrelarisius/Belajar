@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Buku Resep dan Menu Masakan Keluarga</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primaryOrange: '#EA580C',
+                        headerOrange: '#F97316',
+                        softCream: '#FEF3C7',
+                        cardCream: '#FFFBEB'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-[#FDF6E2] min-h-screen text-neutral-800">
+
+    <!-- 1. HEADER -->
+    <header class="bg-[#F26A1B] text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- Logo & Title -->
+            <div class="flex items-center space-x-4">
+                <div class="bg-white text-[#F26A1B] font-bold px-4 py-2 rounded-lg shadow-sm border border-orange-200 tracking-wider">
+                    Logo
+                </div>
+                <h1 class="text-lg sm:text-xl md:text-2xl font-bold tracking-tight">
+                    Buku Resep dan Menu Masakan Keluarga
+                </h1>
+            </div>
+
+            <!-- Navigation & Profile -->
+            <div class="flex items-center space-x-6 md:space-x-8">
+                <!-- Nav Links (Hidden on small mobile) -->
+                <nav class="hidden md:flex items-center space-x-6 font-medium text-sm sm:text-base">
+                    <a href="#" class="hover:underline underline-offset-4 decoration-2 font-semibold">Dashboard</a>
+                    <a href="#" class="hover:underline underline-offset-4 decoration-2 opacity-90 hover:opacity-100">Kategori</a>
+                    <a href="#" class="hover:underline underline-offset-4 decoration-2 opacity-90 hover:opacity-100">Pencatatan</a>
+                    <a href="#" class="hover:underline underline-offset-4 decoration-2 opacity-90 hover:opacity-100">Perencanaan</a>
+                </nav>
+
+                <!-- Profile -->
+                <div class="flex items-center space-x-2 bg-orange-700/30 px-3 py-1.5 rounded-full border border-orange-400/30">
+                    <div class="w-8 h-8 rounded-full bg-neutral-900 text-white flex items-center justify-center font-bold text-xs shadow-inner">
+                        👤
+                    </div>
+                    <span class="text-sm font-medium pr-1">Pengguna</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu Bar -->
+        <div class="md:hidden bg-[#E05A12] px-4 py-2 flex justify-around text-xs font-medium border-t border-orange-600">
+            <a href="#" class="hover:underline font-semibold">Dashboard</a>
+            <a href="#" class="hover:underline opacity-90">Kategori</a>
+            <a href="#" class="hover:underline opacity-90">Pencatatan</a>
+            <a href="#" class="hover:underline opacity-90">Perencanaan</a>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- DASHBOARD TITLE SECTION -->
+        <div class="mb-8">
+            <h2 class="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-neutral-900 mb-1">
+                DASHBOARD RESEP SAYA
+            </h2>
+            <p class="text-sm sm:text-base text-neutral-600">
+                Jelajahi Menu Favorit dan Rekomendasi Makanan
+            </p>
+        </div>
+
+        <!-- SECTION: FAVORIT -->
+        <section class="mb-12">
+            <h3 class="text-base sm:text-lg font-bold text-neutral-900 mb-4 tracking-wide uppercase">
+                FAVORIT
+            </h3>
+
+            <!-- Grid Container -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                
+                <!-- Card 1: Nasi Goreng Spesial -->
+                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
+                    <div class="absolute top-4 right-4 text-red-600 text-lg cursor-pointer hover:scale-110 transition z-10">
+                        ❤️
+                    </div>
+                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
+                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Nasi+Goreng" alt="Nasi Goreng Spesial" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Nasi Goreng Spesial</h4>
+                        <p class="text-xs text-neutral-500">Hidangan Utama</p>
+                    </div>
+                </div>
+
+                <!-- Card 2: Ayam Rendang -->
+                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
+                    <div class="absolute top-4 right-4 text-red-600 text-lg cursor-pointer hover:scale-110 transition z-10">
+                        ❤️
+                    </div>
+                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
+                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Ayam+Rendang" alt="Ayam Rendang" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Ayam Rendang</h4>
+                        <p class="text-xs text-neutral-500">Hidangan Utama</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: Risol Kentang -->
+                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
+                    <div class="absolute top-4 right-4 text-red-600 text-lg cursor-pointer hover:scale-110 transition z-10">
+                        ❤️
+                    </div>
+                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
+                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Risol+Kentang" alt="Risol Kentang" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Risol Kentang</h4>
+                        <p class="text-xs text-neutral-500">Cemilan</p>
+                    </div>
+                </div>
+
+                <!-- Card 4: Udang Balado -->
+                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
+                    <div class="absolute top-4 right-4 text-red-600 text-lg cursor-pointer hover:scale-110 transition z-10">
+                        ❤️
+                    </div>
+                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
+                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Udang+Balado" alt="Udang Balado" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Udang Balado</h4>
+                        <p class="text-xs text-neutral-500">Cemilan</p>
+                    </div>
+                </div>
+
+                <!-- Card 5: Gulai Pakis -->
+                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
+                    <div class="absolute top-4 right-4 text-red-600 text-lg cursor-pointer hover:scale-110 transition z-10">
+                        ❤️
+                    </div>
+                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
+                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Gulai+Pakis" alt="Gulai Pakis" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Gulai Pakis</h4>
+                        <p class="text-xs text-neutral-500">Sayuran</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION: REKOMENDASI -->
+        <section class="mb-12">
+            <h3 class="text-base sm:text-lg font-bold text-neutral-900 mb-4 tracking-wide uppercase">
+                REKOMENDASI
+            </h3>
+
+            <!-- Grid Container -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                
+                <!-- Card 1: Pindang Serani Kuah Kuning -->
+                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
+                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
+                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Pindang+Serani" alt="Pindang Serani Kuah Kuning" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Pindang Serani Kuah Kuning</h4>
+                        <p class="text-xs text-neutral-500">Hidangan Utama</p>
+                    </div>
+                </div>
+
+                <!-- Card 2: Bolu Coklat Lumer -->
+                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
+                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
+                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Bolu+Coklat" alt="Bolu Coklat Lumer" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Bolu Coklat Lumer</h4>
+                        <p class="text-xs text-neutral-500">Makanan Penutup</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: Asem Bandeng Tradisional -->
+                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
+                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
+                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Asem+Bandeng" alt="Asem Bandeng Tradisional" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Asem Bandeng Tradisional</h4>
+                        <p class="text-xs text-neutral-500">Hidangan Utama</p>
+                    </div>
+                </div>
+
+                <!-- Card 4: Nasi Gudeg -->
+                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
+                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
+                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Nasi+Gudeg" alt="Nasi Gudeg" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Nasi Gudeg</h4>
+                        <p class="text-xs text-neutral-500">Hidangan Utama</p>
+                    </div>
+                </div>
+
+                <!-- Card 5: Martabak Keju -->
+                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
+                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
+                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Martabak+Keju" alt="Martabak Keju" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Martabak Keju</h4>
+                        <p class="text-xs text-neutral-500">Makanan Penutup</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+</body>
+</html>
