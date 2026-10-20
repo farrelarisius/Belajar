@@ -1,61 +1,63 @@
 -- =====================================================
 -- DATABASE RESEP & MENU MASAKAN KELUARGA
--- Kompatibel dengan MySQL / MariaDB
+-- Versi PostgreSQL (kompatibel dengan Supabase SQL Editor)
 -- =====================================================
 
-DROP DATABASE IF EXISTS resep_keluarga;
-CREATE DATABASE resep_keluarga CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE resep_keluarga;
+-- Hapus tabel lama agar script bisa dijalankan ulang
+DROP TABLE IF EXISTS menu_mingguan CASCADE;
+DROP TABLE IF EXISTS langkah_memasak CASCADE;
+DROP TABLE IF EXISTS resep_bahan CASCADE;
+DROP TABLE IF EXISTS anggota_keluarga CASCADE;
+DROP TABLE IF EXISTS resep CASCADE;
+DROP TABLE IF EXISTS bahan CASCADE;
+DROP TABLE IF EXISTS kategori CASCADE;
 
 -- =====================================================
 -- 1. STRUKTUR TABEL
 -- =====================================================
 
 CREATE TABLE kategori (
-    id_kategori INT AUTO_INCREMENT PRIMARY KEY,
+    id_kategori INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nama_kategori VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE resep (
-    id_resep INT AUTO_INCREMENT PRIMARY KEY,
+    id_resep INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nama_resep VARCHAR(100) NOT NULL,
-    id_kategori INT NOT NULL,
+    id_kategori INT NOT NULL REFERENCES kategori(id_kategori),
     asal_daerah VARCHAR(50),
     porsi INT NOT NULL DEFAULT 4,
     waktu_persiapan_menit INT,
     waktu_memasak_menit INT,
-    tingkat_kesulitan ENUM('Mudah','Sedang','Sulit') DEFAULT 'Mudah',
-    deskripsi TEXT,
-    FOREIGN KEY (id_kategori) REFERENCES kategori(id_kategori)
+    tingkat_kesulitan VARCHAR(10) DEFAULT 'Mudah'
+        CHECK (tingkat_kesulitan IN ('Mudah','Sedang','Sulit')),
+    deskripsi TEXT
 );
 
 CREATE TABLE bahan (
-    id_bahan INT AUTO_INCREMENT PRIMARY KEY,
+    id_bahan INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nama_bahan VARCHAR(80) NOT NULL,
     satuan_default VARCHAR(20)
 );
 
 CREATE TABLE resep_bahan (
-    id_resep INT NOT NULL,
-    id_bahan INT NOT NULL,
+    id_resep INT NOT NULL REFERENCES resep(id_resep) ON DELETE CASCADE,
+    id_bahan INT NOT NULL REFERENCES bahan(id_bahan),
     jumlah DECIMAL(10,2) NOT NULL,
     satuan VARCHAR(20) NOT NULL,
     keterangan VARCHAR(100),
-    PRIMARY KEY (id_resep, id_bahan),
-    FOREIGN KEY (id_resep) REFERENCES resep(id_resep) ON DELETE CASCADE,
-    FOREIGN KEY (id_bahan) REFERENCES bahan(id_bahan)
+    PRIMARY KEY (id_resep, id_bahan)
 );
 
 CREATE TABLE langkah_memasak (
-    id_langkah INT AUTO_INCREMENT PRIMARY KEY,
-    id_resep INT NOT NULL,
+    id_langkah INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_resep INT NOT NULL REFERENCES resep(id_resep) ON DELETE CASCADE,
     urutan INT NOT NULL,
-    instruksi TEXT NOT NULL,
-    FOREIGN KEY (id_resep) REFERENCES resep(id_resep) ON DELETE CASCADE
+    instruksi TEXT NOT NULL
 );
 
 CREATE TABLE anggota_keluarga (
-    id_anggota INT AUTO_INCREMENT PRIMARY KEY,
+    id_anggota INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nama VARCHAR(50) NOT NULL,
     peran VARCHAR(30),
     makanan_favorit VARCHAR(100),
@@ -63,12 +65,13 @@ CREATE TABLE anggota_keluarga (
 );
 
 CREATE TABLE menu_mingguan (
-    id_menu INT AUTO_INCREMENT PRIMARY KEY,
-    hari ENUM('Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu') NOT NULL,
-    waktu_makan ENUM('Sarapan','Makan Siang','Makan Malam') NOT NULL,
-    id_resep INT NOT NULL,
-    catatan VARCHAR(150),
-    FOREIGN KEY (id_resep) REFERENCES resep(id_resep)
+    id_menu INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    hari VARCHAR(6) NOT NULL
+        CHECK (hari IN ('Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu')),
+    waktu_makan VARCHAR(12) NOT NULL
+        CHECK (waktu_makan IN ('Sarapan','Makan Siang','Makan Malam')),
+    id_resep INT NOT NULL REFERENCES resep(id_resep),
+    catatan VARCHAR(150)
 );
 
 -- =====================================================
@@ -350,8 +353,10 @@ INSERT INTO menu_mingguan (hari, waktu_makan, id_resep, catatan) VALUES
 -- FROM resep_bahan rb JOIN bahan b ON rb.id_bahan = b.id_bahan
 -- WHERE rb.id_resep = 5;
 
--- Menu mingguan:
+-- Menu mingguan (urut hari dan waktu makan):
 -- SELECT m.hari, m.waktu_makan, r.nama_resep, m.catatan
 -- FROM menu_mingguan m JOIN resep r ON m.id_resep = r.id_resep
--- ORDER BY FIELD(m.hari,'Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'),
---          FIELD(m.waktu_makan,'Sarapan','Makan Siang','Makan Malam');
+-- ORDER BY
+--   CASE m.hari WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3
+--     WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 WHEN 'Sabtu' THEN 6 ELSE 7 END,
+--   CASE m.waktu_makan WHEN 'Sarapan' THEN 1 WHEN 'Makan Siang' THEN 2 ELSE 3 END;
