@@ -10,11 +10,8 @@
 </head>
 <body>
   <main class="kartu">
-
-    <!-- Kiri: sambutan -->
     <section class="sambutan">
-      <div class="logo"><img src="Polibatam Univ Logo baru .png" width="150px" height="150px" alt="logo"></div> <!-- ganti dengan <img src="img/logo.png" alt="Logo"> -->
-
+      <div class="logo"><img src="Polibatam Univ Logo baru .png" width="150px" height="150px" alt="logo"></div>
       <div class="slide-area">
         <div class="slide aktif">
           <h2 class="regis">Selamat Datang Di</h2>
@@ -38,7 +35,6 @@
       </div>
     </section>
 
-    <!-- Kanan: form registrasi -->
     <section class="form-panel">
       <h1>Registrasi Akun</h1>
       <p class="sub">Lengkapi data di bawah ini</p>
@@ -46,20 +42,20 @@
       <form id="formRegistrasi" novalidate>
         <div class="field">
           <label for="nama">Nama Lengkap :</label>
-          <input type="text" id="nama" name="nama" placeholder="Farrel Arisius Ginting" autocomplete="name">
+          <input type="text" id="nama" name="nama" placeholder="Masukkan Nama Lengkap Anda" autocomplete="name">
           <div class="pesan-error"></div>
         </div>
 
         <div class="field">
           <label for="username">Username :</label>
-          <input type="text" id="username" name="username" placeholder="farrel07" autocomplete="username">
+          <input type="text" id="username" name="username" placeholder="Masukkan Username Anda" autocomplete="username">
           <div class="pesan-error"></div>
         </div>
 
         <div class="field">
           <label for="password">Password :</label>
           <div class="input-wrap">
-            <input type="password" id="password" name="password" placeholder="******" autocomplete="new-password">
+            <input type="password" id="password" name="password" placeholder="Masukkan Password Anda" autocomplete="new-password">
             <button type="button" class="toggle-pw" data-target="password">Lihat</button>
           </div>
           <div class="pesan-error"></div>
