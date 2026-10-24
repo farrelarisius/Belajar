@@ -237,9 +237,10 @@
     margin-bottom:14px
   }
 
+  /* + kolom satuan */
   .grup-head{
     display:grid;
-    grid-template-columns:auto 1fr 90px;
+    grid-template-columns:auto 1fr 70px 90px;
     gap:12px;
     align-items:center;
     background:#FDCF9E;
@@ -258,19 +259,23 @@
     font-size:13px
   }
 
+  /* nama, jumlah, satuan */
   .bahan-row{
     display:grid;
-    grid-template-columns:1fr 70px;
+    grid-template-columns:1fr 70px 90px;
     gap:12px;
     margin:8px 0 0 20px
   }
 
-  .bahan-row input{
+  .bahan-row input,
+  .bahan-row select{
     background:#FDCF9E;
+    color:black;
     border:0;
     border-radius:3px;
     padding:7px;
-    font-size:13px
+    font-size:13px;
+    font-family:Arial,sans-serif
   }
 
   .mini{
@@ -352,11 +357,10 @@
     background-color: #d90000;
     text-decoration: underline;
   }
-
-  #menuLogout,
-  #menuLogin,
+  #menuSettings,
   #favorit,
-  #menuSettings {
+  #menuLogin,
+  #menuLogout {
     display: block;
     color: white;
     margin: 16px;
@@ -372,6 +376,114 @@
   #drawerScrollingLabel {
     color: #E89149;
     margin: 15px;
+  }
+
+
+  /* DAFTAR RESEP */
+  .daftar-wrap{
+    margin:30px 20px 0
+  }
+  .daftar-wrap h2{
+    font-size:16px;
+    font-weight:700;
+    margin-bottom:12px
+  }
+  .kosong{
+    font-size:13px;
+    color:#7a5a3a
+  }
+  /* reset margin span global khusus di daftar resep */
+  .daftar-wrap span{
+    margin-bottom:0
+  }
+  .resep-item{
+    background:#fff;
+    border-radius:6px;
+    margin-bottom:10px;
+    overflow:hidden
+  }
+  .resep-item summary{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:12px 14px;
+    background:#FDCF9E;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    list-style:none
+  }
+  .resep-item summary::-webkit-details-marker{display:none}
+  .resep-item summary::after{
+    content:"▾";
+    margin-left:auto;
+    transition:transform .2s
+  }
+  .resep-item[open] summary::after{
+    transform:rotate(180deg)
+  }
+  .resep-item summary:hover{
+    background:#fbc386
+  }
+  .badge-kat{
+    background:#E8690F;
+    color:#fff;
+    font-size:11px;
+    padding:3px 10px;
+    border-radius:20px
+  }
+  .resep-detail{
+    display:grid;
+    grid-template-columns:140px 1fr;
+    gap:16px;
+    padding:14px;
+    font-size:13px
+  }
+  .r-foto{
+    width:140px;
+    height:170px;
+    object-fit:cover;
+    border-radius:8px
+  }
+  .r-info{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:6px 20px;
+    margin-bottom:12px
+  }
+  .r-info b,
+  .r-label{
+    display:block;
+    font-size:11px;
+    color:#E8690F
+  }
+  .r-bahan h4{
+    font-size:13px;
+    margin:10px 0 4px
+  }
+  .r-bahan ul{
+    margin-left:18px
+  }
+  .r-catatan{
+    margin-top:10px
+  }
+  .btn-hapus-resep{
+    margin-top:12px;
+    background:#E8690F;
+    color:#fff;
+    border:0;
+    border-radius:3px;
+    padding:6px 14px;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer
+  }
+  .btn-hapus-resep:hover{background:#d90000}
+
+  @media(max-width:600px){
+    .resep-detail{grid-template-columns:1fr}
+    .r-foto{width:100%;height:200px}
   }
 
   @media(max-width:560px){.nav-links{display:none}}
@@ -399,8 +511,8 @@
   <div class="drawer-body">
     <div id="userMenu">
         <a href="#" id="menuSettings">Pengaturan</a>
-        <a href="login.html" id="menuLogin">Login</a>
         <a href="#" id="favorit">Favorit</a>
+        <a href="login.html" id="menuLogin">Login</a>
         <a href="login.html" id="menuLogout">Logout</a>
       </div>
   </div>
@@ -421,11 +533,19 @@
           <input type="file" id="fotoInput" accept="image/*" hidden>
 
           <div class="two">
-            <div><label for="persiapan">Waktu Persiapan</label><input class="field" id="persiapan" placeholder="mis. 15 menit"></div>
-            <div><label for="memasak">Waktu Memasak</label><input class="field" id="memasak" placeholder="mis. 30 menit"></div>
-            <div><label for="porsi">Porsi</label><input class="field" id="porsi" placeholder="mis. 4 porsi"></div>
-            <div><label for="kesulitan">Kesulitan</label>
+            <div>
+              <label for="persiapan">Waktu Persiapan</label><input class="field" id="persiapan" placeholder="mis. 15 menit"></div>
+            <div>
+              <label for="memasak">Waktu Memasak</label><input class="field" id="memasak" placeholder="mis. 30 menit"></div>
+            <div>
+              <label for="porsi">Porsi</label><input class="field" id="porsi" placeholder="mis. 4 porsi"></div>
+            <div>
+              <label for="kesulitan">Kesulitan</label>
               <select class="field" id="kesulitan"><option>Mudah</option><option>Sedang</option><option>Sulit</option></select></div>
+            <div>
+              <label for="kategori">Kategori</label>
+              <select class="field" id="kategori"><option>Sarapan</option><option>Hidangan Utama</option><option>Cemilan</option></select>
+            </div>
           </div>
 
           <label for="catatan">Catatan Tambahan</label>
@@ -439,6 +559,13 @@
         </div>
         <div class="save-row"><button type="submit" class="save">Simpan</button></div>
       </form>
+
+      <!-- DAFTAR RESEP TERSIMPAN -->
+      <section class="daftar-wrap">
+        <h2>DAFTAR RESEP TERSIMPAN</h2>
+        <p id="kosong" class="kosong">Belum ada resep yang disimpan.</p>
+        <div id="resepList"></div>
+      </section>
     </div>
 </main>
 
@@ -471,6 +598,16 @@
   });
 
   // ===== Pencatatan resep =====
+
+  // Daftar satuan bahan
+  const SATUAN = [
+    "gram", "kg", "ml", "liter",
+    "sdt", "sdm", "gelas", "cangkir",
+    "butir", "buah", "siung", "batang",
+    "lembar", "ruas", "bungkus", "secukupnya"
+  ];
+  const opsiSatuan = SATUAN.map(s => `<option value="${s}">${s}</option>`).join("");
+
   function perbaruiGrup(){
     const gs = document.querySelectorAll(".grup");
     gs.forEach((g, i) => {
@@ -483,7 +620,10 @@
   function tambahBahan(g){
     const r = document.createElement("div");
     r.className = "bahan-row";
-    r.innerHTML = '<input placeholder="Nama bahan" aria-label="Nama bahan"><input placeholder="Jumlah" aria-label="Kuantitas">';
+    r.innerHTML =
+      '<input class="b-nama" placeholder="Nama bahan" aria-label="Nama bahan">' +
+      '<input class="b-jumlah" type="number" min="0" step="any" placeholder="Jumlah" aria-label="Jumlah">' +
+      '<select class="b-satuan" aria-label="Satuan">' + opsiSatuan + '</select>';
     g.querySelector(".rows").appendChild(r);
     perbaruiGrup();
   }
@@ -495,7 +635,7 @@
   function tambahGrup(){
     const g = document.createElement("div");
     g.className = "grup";
-    g.innerHTML = '<div class="grup-head"><span class="gno"></span><input class="nama-grup"><span>Kuantitas</span></div>' +
+    g.innerHTML = '<div class="grup-head"><span class="gno"></span><input class="nama-grup"><span>Jumlah</span><span>Satuan</span></div>' +
       '<div class="rows"></div>' +
       '<div class="actions">' +
         '<button type="button" class="mini tambah">Tambahkan bahan</button>' +
@@ -511,22 +651,123 @@
   $("addGrup").onclick = tambahGrup;
   tambahGrup();
 
+  // Foto resep (URL disimpan agar bisa ditampilkan di daftar)
+  let fotoUrl = "";
+  const fotoAwal = $("fotoBox").innerHTML;
+
   $("fotoInput").addEventListener("change", e => {
     const f = e.target.files[0];
     if(!f) return;
+    fotoUrl = URL.createObjectURL(f);
     const img = document.createElement("img");
     img.alt = "Foto resep";
-    img.src = URL.createObjectURL(f);
+    img.src = fotoUrl;
     $("fotoBox").replaceChildren(img);
     $("plusBadge").classList.add("show");
   });
   $("fotoBox").addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); $("fotoInput").click(); } });
 
+  // ===== Daftar resep tersimpan =====
+  const daftarResep = [];
+
+  // Hindari karakter HTML berbahaya dari input pengguna
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  }[c]));
+
+  function tampilkanResep(){
+    $("kosong").style.display = daftarResep.length ? "none" : "block";
+
+    $("resepList").innerHTML = daftarResep.map((r, i) => `
+      <details class="resep-item">
+        <summary>
+          <span>${esc(r.judul)}</span>
+          <span class="badge-kat">${esc(r.kategori)}</span>
+        </summary>
+        <div class="resep-detail">
+          ${r.foto ? `<img class="r-foto" src="${r.foto}" alt="Foto ${esc(r.judul)}">` : "<div></div>"}
+          <div>
+            <div class="r-info">
+              <div><b>Waktu Persiapan</b>${esc(r.persiapan) || "-"}</div>
+              <div><b>Waktu Memasak</b>${esc(r.memasak) || "-"}</div>
+              <div><b>Porsi</b>${esc(r.porsi) || "-"}</div>
+              <div><b>Kesulitan</b>${esc(r.kesulitan)}</div>
+            </div>
+
+            <div class="r-bahan">
+              <b class="r-label">Bahan-bahan</b>
+              ${r.bahan.map((g, n) => `
+                <h4>${esc(g.grup) || "Grub " + (n + 1)}</h4>
+                <ul>
+                  ${g.items.filter(b => b.nama).map(b => `
+                    <li>${esc(b.nama)} - ${esc(b.jumlah)} ${esc(b.satuan)}</li>
+                  `).join("")}
+                </ul>
+              `).join("")}
+            </div>
+
+            ${r.catatan ? `<div class="r-catatan"><b class="r-label">Catatan</b>${esc(r.catatan)}</div>` : ""}
+
+            <button type="button" class="btn-hapus-resep" data-index="${i}">Hapus Resep</button>
+          </div>
+        </div>
+      </details>
+    `).join("");
+  }
+
+  // Tombol hapus resep (event delegation)
+  $("resepList").addEventListener("click", e => {
+    const btn = e.target.closest(".btn-hapus-resep");
+    if(!btn) return;
+    if(confirm("Hapus resep ini?")){
+      daftarResep.splice(Number(btn.dataset.index), 1);
+      tampilkanResep();
+    }
+  });
+
+  // Reset form setelah simpan
+  function resetForm(){
+    $("noteForm").reset();
+    $("grupList").innerHTML = "";
+    tambahGrup();
+    $("fotoBox").innerHTML = fotoAwal;
+    $("plusBadge").classList.remove("show");
+    fotoUrl = "";
+  }
+
   $("noteForm").addEventListener("submit", e => {
     e.preventDefault();
-    // Ganti dengan pengiriman data ke backend proyek kita
-    alert("Resep \"" + $("judul").value + "\" tersimpan.");
+
+    // Kumpulkan data bahan: grub -> nama, jumlah, satuan
+    const bahan = [...document.querySelectorAll(".grup")].map(g => ({
+      grup: g.querySelector(".nama-grup").value,
+      items: [...g.querySelectorAll(".bahan-row")].map(r => ({
+        nama:   r.querySelector(".b-nama").value,
+        jumlah: r.querySelector(".b-jumlah").value,
+        satuan: r.querySelector(".b-satuan").value
+      }))
+    }));
+
+    const resep = {
+      judul:     $("judul").value,
+      foto:      fotoUrl,
+      persiapan: $("persiapan").value,
+      memasak:   $("memasak").value,
+      porsi:     $("porsi").value,
+      kesulitan: $("kesulitan").value,
+      kategori:  $("kategori").value,
+      catatan:   $("catatan").value,
+      bahan
+    };
+
+    // TODO: ganti dengan pengiriman data ke backend proyek kita
+    daftarResep.unshift(resep);   // resep terbaru tampil paling atas
+    tampilkanResep();
+    resetForm();
+    alert("Resep \"" + resep.judul + "\" tersimpan.");
   });
+
+  tampilkanResep();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
