@@ -296,6 +296,7 @@
   #menuLogout:hover {
     background-color: #d90000;
   }
+  
   #menuSettings,
   #menuLogin,
   #menuRegis,
@@ -315,6 +316,80 @@
   #drawerScrollingLabel {
     color: #E89149;
     margin: 15px;
+  }
+
+
+  /* KARTU BISA DIKLIK */
+  .card{cursor:pointer;transition:transform .15s, box-shadow .15s}
+  .card:hover,.card:focus-visible{
+    transform:translateY(-3px);
+    box-shadow:0 6px 14px rgba(0,0,0,.18);
+    outline:none
+  }
+
+  /* POP UP DETAIL RESEP */
+  dialog.resep-modal{
+    border:0;
+    border-radius:18px;
+    padding:0;
+    width:92%;
+    max-width:520px;
+    background:#fff;
+    color:#000;
+    margin:auto;
+    overflow:hidden
+  }
+  dialog.resep-modal::backdrop{background:rgba(0,0,0,.55)}
+  .resep-head{
+    background:#E89149;
+    color:#fff;
+    padding:16px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px
+  }
+  .resep-head h2{font-size:18px;margin:0}
+  .resep-head small{font-size:12px;opacity:.95}
+  .resep-tutup{
+    background:none;
+    border:0;
+    color:#fff;
+    font-size:26px;
+    line-height:1;
+    cursor:pointer
+  }
+  .resep-body{
+    padding:16px 20px 22px;
+    max-height:65vh;
+    overflow-y:auto;
+    font-size:14px;
+    line-height:1.5
+  }
+  .resep-info{display:flex;gap:16px;font-size:13px;margin-bottom:14px}
+  .resep-info span{margin-bottom:0}
+  .resep-body h4{font-size:15px;margin:14px 0 6px;color:#E89149}
+  .resep-body ul,.resep-body ol{padding-left:20px}
+
+  /* Gambar di kartu */
+  .card{overflow:hidden;padding:0;justify-content:flex-start}
+  .card-img{
+    width:100%;
+    height:90px;
+    object-fit:cover;
+    display:block;
+    background:#f3e3d3
+  }
+  .card-teks{padding:10px 14px}
+  .heart{text-shadow:0 1px 3px rgba(255,255,255,.9)}
+
+  /* Gambar di pop up */
+  .resep-img{
+    width:100%;
+    max-height:220px;
+    object-fit:cover;
+    display:block;
+    background:#f3e3d3
   }
 
 </style>
@@ -381,21 +456,73 @@
     </section>
 </main>
 
+<!-- POP UP DETAIL RESEP -->
+<dialog class="resep-modal" id="resepModal" aria-labelledby="mJudul">
+  <div class="resep-head">
+    <div>
+      <h2 id="mJudul"></h2>
+      <small id="mKat"></small>
+    </div>
+    <button class="resep-tutup" id="mTutup" aria-label="Tutup">&times;</button>
+  </div>
+  <img id="mGambar" class="resep-img" alt="">
+  <div class="resep-body">
+    <div class="resep-info">
+      <span id="mWaktu"></span>
+      <span id="mPorsi"></span>
+    </div>
+    <h4>Bahan-bahan</h4>
+    <ul id="mBahan"></ul>
+    <h4>Langkah Memasak</h4>
+    <ol id="mLangkah"></ol>
+  </div>
+</dialog>
+
 <footer>&copy; Buku Resep dan Menu Masakan Keluarga</footer>
 
 <script>
   // ===== Data resep favorit dan rekomendasi =====
   const RESEP = [
-    {id:1, nama:"Nasi Goreng Spesial", kat:"Hidangan Utama"},
-    {id:2, nama:"Ayam Rendang", kat:"Hidangan Utama"},
-    {id:3, nama:"Risol Kentang", kat:"Cemilan"},
-    {id:4, nama:"Udang Balado", kat:"Cemilan"},
-    {id:5, nama:"Gulai Pakis", kat:"Sayuran"},
-    {id:6, nama:"Pindang Serani Kuah Kuning", kat:"Hidangan Utama"},
-    {id:7, nama:"Bolu Coklat Lumer", kat:"Makanan Penutup"},
-    {id:8, nama:"Asem Bandeng Tradisional", kat:"Hidangan Utama"},
-    {id:9, nama:"Nasi Gudeg", kat:"Hidangan Utama"},
-    {id:10, nama:"Martabak Keju", kat:"Makanan Penutup"}
+    {id:1, nama:"Nasi Goreng Spesial", kat:"Hidangan Utama", waktu:"20 menit", porsi:"2 porsi",
+     gambar:"img/nasi-goreng.jpg",
+     bahan:["2 piring nasi putih","2 butir telur","3 siung bawang putih","2 siung bawang merah","2 sdm kecap manis","Garam & merica secukupnya","Daun bawang, irisan"],
+     langkah:["Haluskan bawang putih dan bawang merah, lalu tumis hingga harum.","Masukkan telur, orak-arik hingga matang.","Tambahkan nasi, kecap, garam, dan merica. Aduk rata.","Taburi daun bawang, sajikan hangat."]},
+    {id:2, nama:"Ayam Rendang", kat:"Hidangan Utama", waktu:"60 menit", porsi:"4 porsi",
+     gambar:"img/ayam-rendang.jpg",
+     bahan:["500 g ayam, potong","400 ml santan","2 lembar daun jeruk","1 batang serai, memarkan","Bumbu halus: bawang merah, bawang putih, cabai, jahe, lengkuas, kunyit"],
+     langkah:["Tumis bumbu halus bersama serai dan daun jeruk hingga harum.","Masukkan ayam, aduk hingga berubah warna.","Tuang santan, masak dengan api kecil sambil sesekali diaduk.","Masak hingga kuah mengental dan bumbu meresap."]},
+    {id:3, nama:"Risol Kentang", kat:"Cemilan", waktu:"45 menit", porsi:"10 buah",
+     gambar:"img/risol-kentang.jpg",
+     bahan:["3 buah kentang, kukus lalu haluskan","10 lembar kulit risol","1 sdm margarin","Garam, merica, pala secukupnya","Tepung roti untuk melapisi"],
+     langkah:["Campur kentang halus dengan margarin, garam, merica, dan pala.","Isi kulit risol dengan adonan, lipat rapat.","Celupkan ke adonan tepung, lalu gulingkan pada tepung roti.","Goreng hingga kuning keemasan."]},
+    {id:4, nama:"Udang Balado", kat:"Cemilan", waktu:"25 menit", porsi:"3 porsi",
+     gambar:"img/udang-balado.jpg",
+     bahan:["300 g udang, bersihkan","8 cabai merah","3 siung bawang putih","3 siung bawang merah","1 buah tomat","Garam, gula, dan perasan jeruk nipis"],
+     langkah:["Goreng udang sebentar hingga setengah matang, angkat.","Haluskan cabai, bawang, dan tomat, lalu tumis hingga matang.","Masukkan udang, tambahkan garam, gula, dan jeruk nipis.","Aduk rata dan masak hingga bumbu meresap."]},
+    {id:5, nama:"Gulai Pakis", kat:"Sayuran", waktu:"30 menit", porsi:"4 porsi",
+     gambar:"img/gulai-pakis.jpg",
+     bahan:["250 g pakis, potong-potong","300 ml santan","2 lembar daun salam","1 batang serai","Bumbu halus: bawang merah, bawang putih, kunyit, cabai, kemiri"],
+     langkah:["Tumis bumbu halus bersama salam dan serai hingga harum.","Masukkan pakis, aduk sebentar.","Tuang santan dan masak dengan api kecil hingga pakis empuk.","Koreksi rasa, sajikan."]},
+    {id:6, nama:"Pindang Serani Kuah Kuning", kat:"Hidangan Utama", waktu:"40 menit", porsi:"4 porsi",
+     gambar:"img/pindang-serani.jpg",
+     bahan:["1 ekor ikan serani, potong","1 ruas kunyit","3 buah cabai rawit","2 batang serai","1 buah tomat","Belimbing wuluh atau asam jawa","Garam secukupnya"],
+     langkah:["Rebus air bersama serai dan bumbu halus hingga mendidih.","Masukkan ikan, masak dengan api sedang.","Tambahkan tomat, cabai rawit, dan belimbing wuluh.","Masak hingga ikan matang dan kuah beraroma segar."]},
+    {id:7, nama:"Bolu Coklat Lumer", kat:"Makanan Penutup", waktu:"50 menit", porsi:"8 potong",
+     gambar:"img/bolu-coklat.jpg",
+     bahan:["150 g tepung terigu","100 g gula pasir","3 butir telur","100 g dark chocolate","100 g mentega","1 sdt baking powder"],
+     langkah:["Lelehkan coklat dan mentega, dinginkan sebentar.","Kocok telur dan gula hingga mengembang.","Masukkan tepung dan baking powder, lalu campurkan lelehan coklat.","Panggang pada suhu 170°C selama 25–30 menit."]},
+    {id:8, nama:"Asem Bandeng Tradisional", kat:"Hidangan Utama", waktu:"45 menit", porsi:"4 porsi",
+     gambar:"img/asem-bandeng.jpg",
+     bahan:["1 ekor ikan bandeng","3 buah tomat hijau","5 buah cabai rawit","2 batang serai","Asam jawa secukupnya","Bawang merah dan bawang putih"],
+     langkah:["Didihkan air bersama bawang, serai, dan asam jawa.","Masukkan ikan bandeng yang sudah dibersihkan.","Tambahkan tomat dan cabai rawit.","Masak hingga ikan matang dan kuah terasa segar asam."]},
+    {id:9, nama:"Nasi Gudeg", kat:"Hidangan Utama", waktu:"120 menit", porsi:"5 porsi",
+     gambar:"img/nasi-gudeg.jpg",
+     bahan:["500 g nangka muda","500 ml santan","3 lembar daun salam","Gula merah secukupnya","Telur rebus & ayam opsional","Bumbu halus: bawang merah, bawang putih, kemiri, ketumbar"],
+     langkah:["Rebus nangka muda hingga agak empuk, tiriskan.","Tumis bumbu halus, masukkan nangka dan daun salam.","Tuang santan dan gula merah, masak dengan api kecil.","Masak lama hingga kuah menyusut dan warna kecokelatan."]},
+    {id:10, nama:"Martabak Keju", kat:"Makanan Penutup", waktu:"40 menit", porsi:"4 potong",
+     gambar:"img/martabak-keju.jpg",
+     bahan:["250 g tepung terigu","1 sdt ragi instan","1 butir telur","250 ml air","Keju parut","Susu kental manis","Mentega"],
+     langkah:["Campur tepung, ragi, telur, dan air; diamkan 30 menit.","Tuang adonan ke teflon, masak hingga berlubang di permukaan.","Olesi mentega, taburi keju dan susu kental manis.","Lipat, potong, dan sajikan hangat."]}
   ];
   const REKOMENDASI = [6,7,8,9,10];
 
@@ -411,13 +538,35 @@
 
   const $ = id => document.getElementById(id);
 
+  const GAMBAR_DEFAULT = "data:image/svg+xml;utf8," + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200">' +
+    '<rect width="100%" height="100%" fill="#f3e3d3"/>' +
+    '<text x="50%" y="50%" font-size="60" text-anchor="middle" dominant-baseline="middle">🍽</text></svg>'
+  );
+
   function kartu(r, opsi = {}){
     const div = document.createElement("div");
     div.className = "card";
-    div.innerHTML = `<h3>${r.nama}</h3><small>${r.kat}</small>`;
+    div.tabIndex = 0;
+    div.setAttribute("role", "button");
+    div.setAttribute("aria-label", "Lihat detail " + r.nama);
+    div.innerHTML = `
+      <img class="card-img" src="${r.gambar || GAMBAR_DEFAULT}" alt="${r.nama}" loading="lazy">
+      <div class="card-teks"><h3>${r.nama}</h3><small>${r.kat}</small></div>`;
+    // Kalau file gambar tidak ditemukan, pakai gambar pengganti
+    div.querySelector("img").addEventListener("error", e => {
+      e.target.src = GAMBAR_DEFAULT;
+    }, {once:true});
     if(opsi.heartStatis){
       div.insertAdjacentHTML("afterbegin", '<span class="heart" aria-label="Favorit">&#10084;</span>');
     }
+    div.addEventListener("click", () => bukaDetail(r.id));
+    div.addEventListener("keydown", e => {
+      if(e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        bukaDetail(r.id);
+      }
+    });
     return div;
   }
 
@@ -455,6 +604,32 @@
       setTimeout(() => (location.href = "login.html"), 1000);
       alert("Anda telah logout.");
     }
+  });
+
+  // ===== Pop up detail resep =====
+  const modal = $("resepModal");
+
+  function bukaDetail(id){
+    const r = RESEP.find(x => x.id === id);
+    if(!r) return;
+    $("mJudul").textContent = r.nama;
+    $("mKat").textContent   = r.kat;
+    $("mWaktu").textContent = "⏱ " + r.waktu;
+    $("mPorsi").textContent = "🍽 " + r.porsi;
+    $("mBahan").innerHTML   = r.bahan.map(b => `<li>${b}</li>`).join("");
+    $("mLangkah").innerHTML = r.langkah.map(l => `<li>${l}</li>`).join("");
+    const img = $("mGambar");
+    img.onerror = () => { img.onerror = null; img.src = GAMBAR_DEFAULT; };
+    img.src = r.gambar || GAMBAR_DEFAULT;
+    img.alt = r.nama;
+    modal.showModal();
+  }
+
+  $("mTutup").addEventListener("click", () => modal.close());
+
+  // Klik di luar kotak (area gelap) menutup pop up
+  modal.addEventListener("click", e => {
+    if(e.target === modal) modal.close();
   });
 
   renderDashboard();
