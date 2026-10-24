@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registrasi Akun | Resep Keluarga</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="form-login.css">
+</head>
+<body>
+  <main class="kartu">
+
+    <section class="sambutan">
+      <div class="logo"><img src="Logo-Aplikasi.png" width="150px" height="150px" alt="logo"></div>
+
+      <div class="slide-area">
+        <div class="slide aktif">
+          <h2 class="regis">Selamat Datang Di</h2>
+          <p>Aplikasi Resep dan Menu Masakan Keluarga</p>
+          <p class="tebal">Solusi Kebingungan Kamu</p>
+        </div>
+        <div class="slide">
+          <h2 class="regis">Simpan Resep Favorit</h2>
+          <p class="tebal">Kumpulkan resep andalan keluarga dalam satu tempat.</p>
+        </div>
+        <div class="slide">
+          <h2 class="regis">Atur Menu Harian</h2>
+          <p class="tebal">Susun menu makan seminggu tanpa pusing.</p>
+        </div>
+      </div>
+
+      <div class="dots" role="tablist" aria-label="Slide sambutan">
+        <button class="dot aktif" aria-label="Slide 1"></button>
+        <button class="dot" aria-label="Slide 2"></button>
+        <button class="dot" aria-label="Slide 3"></button>
+      </div>
+    </section>
+
+    <section class="form-panel">
+      <h1>Registrasi Akun</h1>
+      <p class="sub">Lengkapi data di bawah ini</p>
+
+      <form id="formRegistrasi" novalidate>
+        <div class="field">
+          <label for="nama">Nama Lengkap :</label>
+          <input type="text" id="nama" name="nama" placeholder="Masukkan Nama Lengkap Anda" autocomplete="name">
+          <div class="pesan-error"></div>
+        </div>
+
+        <div class="field">
+          <label for="username">Username :</label>
+          <input type="text" id="username" name="username" placeholder="Masukkan Username Anda" autocomplete="username">
+          <div class="pesan-error"></div>
+        </div>
+
+        <div class="field">
+          <label for="password">Password :</label>
+          <div class="input-wrap">
+            <input type="password" id="password" name="password" placeholder="Masukkan Password Anda" autocomplete="new-password">
+            <button type="button" class="toggle-pw" data-target="password">Lihat</button>
+          </div>
+          <div class="pesan-error"></div>
+        </div>
+
+        <div class="field">
+          <label class="setuju">
+            <input type="checkbox" id="setuju" name="setuju">
+            <span>Saya setuju dengan syarat dan ketentuan</span>
+          </label>
+          <div class="pesan-error"></div>
+        </div>
+
+        <button type="submit" class="tombol">Daftar</button>
+        <div class="notif" id="notif" role="status"></div>
+      </form>
+
+      <p class="alihan">Sudah punya akun? <a href="login.html">Login</a></p>
+    </section>
+
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

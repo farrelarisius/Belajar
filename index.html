@@ -1,83 +1,615 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Registrasi Akun | Resep Keluarga</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="form-login.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" >
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
+<style>
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#000}
+
+
+  /* NAVBAR */
+  .navbar{
+    position:sticky;
+    top:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:#E89149;
+    padding:8px 20px;
+    height:60px
+  }
+
+  .logo-btn{
+    border:2px solid #E89149;
+    background:transparent;
+    border-radius:6px;
+    font-weight:700;
+    font-size:15px;
+    color:#fff;
+    cursor:pointer
+  }
+
+  .logo-btn:hover{
+    background:rgba(255,255,255,.15)
+  }
+
+  .nav-right{
+    display:flex;
+    align-items:center;
+    gap:22px
+  }
+
+  .nav-links{
+    display:flex;
+    gap:18px;
+    margin-top: 8px;
+    list-style:none
+  }
+
+  .nav-links a{
+    color:#fff;
+    text-decoration:none;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer
+  }
+
+  .nav-links a:hover,.nav-links a.active{
+    text-decoration:underline
+  }
+  
+  .user{
+    position:relative
+  }
+
+  .user-btn{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:none;
+    border:0;
+    cursor:pointer;
+    color:#fff;
+    font:700 15px Arial,sans-serif
+  }
+
+  span {
+    margin-bottom: 8px;
+  }
+
+  .avatar{
+    width:38px;
+    height:38px;
+    margin-bottom: 10px;
+    border-radius:50%;
+    background:#151515;
+    border:2px solid #fff
+  }
+
+  /* DASHBOARD */
+  .dashboard{
+    background:#FEE8D6;
+    padding:22px 24px 30px
+  }
+
+  .dashboard h1{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:6px
+  }
+
+  .dashboard .sub{
+    font-size:14px;
+    margin-bottom:22px
+  }
+
+  .dashboard h2{
+    font-size:15px;
+    font-weight:700;
+    margin:0 0 10px
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:12px;
+    margin-bottom:28px
+  }
+
+  .card{
+    position:relative;
+    background:#fff;
+    border-radius:18px;
+    min-height:130px;
+    padding:14px 16px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end
+  }
+
+  .card h3{
+    font-size:13px;
+    font-weight:700
+  }
+
+  .card small{
+    font-size:10px;
+    color:#222
+  }
+
+  .heart{
+    position:absolute;
+    top:10px;
+    right:12px;
+    font-size:28px;
+    line-height:1;color:#d90000
+  }
+
+  .empty{
+    grid-column:1/-1;
+    font-size:14px;
+    padding:10px 0
+  }
+
+
+  /* TENTANG KAMI */
+  .about{
+    background:linear-gradient(#FEE8D6,#fff);
+    padding:28px 0 60px;
+    text-align:center
+  }
+
+  .about h2{
+    font-size:24px;
+    margin-bottom:18px
+  }
+
+  .about p{
+    font-size:14px;
+    line-height:1.5;
+    padding:0 6px;
+    text-align:left
+  }
+
+
+  /* HUBUNGI KAMI */
+  .contact{
+    background:#fff;
+    padding:20px 16px 36px;
+    text-align:center
+  }
+
+  .contact h2{
+    font-size:24px;
+    margin-bottom:22px
+  }
+
+  .contact .nama{
+    font-size:14px;
+    margin-bottom:26px
+  }
+
+  .contact form{
+    width:400px;
+    max-width:100%;
+    margin:0 auto
+  }
+
+  .contact input,.contact textarea{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:4px;
+    margin-bottom:10px;
+    font-size:13px
+  }
+  
+  .contact input{
+    font-family:Arial,sans-serif
+  }
+
+  .contact textarea{
+    height:85px;
+    font-family:monospace;
+    resize:vertical
+  }
+
+  .contact button{
+    width:100%;
+    padding:9px;
+    border:0;
+    border-radius:4px;
+    background:#FF6347;
+    color:#fff;
+    font-size:14px;cursor:pointer
+  }
+
+  .contact button:hover{
+    background:#e9553a
+  }
+
+  .msg{
+    margin-top:10px;
+    font-size:13px;
+    color:#1a7f37
+  }
+
+
+  /* FOOTER */
+  footer{
+    background:#E89149;
+    color:#fff;
+    text-align:center;
+    padding:20px;
+    font-size:13px
+  }
+
+  @media(max-width:900px){
+    .grid{grid-template-columns:repeat(2,1fr)}
+    .nav-links{gap:10px}
+    .user-btn span{display:none}
+  }
+  @media(max-width:560px){.nav-links{display:none}}
+  .drawer-body {
+    background-color: #E89149;
+  }
+  #menuLogout:hover {
+    background-color: #d90000;
+  }
+  
+  #menuSettings,
+  #menuLogin,
+  #favorit,
+  #menuLogout {
+    display: block;
+    color: white;
+    margin: 16px;
+    text-decoration: none;
+    align-items: start;
+  }
+  dialog {
+    background-color: #FEE8D6;
+  }
+  .drawer-title {
+    margin-bottom: 20px;
+  }
+  #drawerScrollingLabel {
+    color: #E89149;
+    margin: 15px;
+  }
+
+
+  /* KARTU BISA DIKLIK */
+  .card{cursor:pointer;transition:transform .15s, box-shadow .15s}
+  .card:hover,.card:focus-visible{
+    transform:translateY(-3px);
+    box-shadow:0 6px 14px rgba(0,0,0,.18);
+    outline:none
+  }
+
+  /* POP UP DETAIL RESEP */
+  dialog.resep-modal{
+    border:0;
+    border-radius:18px;
+    padding:0;
+    width:92%;
+    max-width:520px;
+    background:#fff;
+    color:#000;
+    margin:auto;
+    max-height:90vh;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch
+  }
+  dialog.resep-modal::backdrop{background:rgba(0,0,0,.55)}
+  .resep-head{
+    background:#E89149;
+    color:#fff;
+    padding:16px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    position:sticky;
+    top:0;
+    z-index:2
+  }
+  .resep-head h2{font-size:18px;margin:0}
+  .resep-head small{font-size:12px;opacity:.95}
+  .resep-tutup{
+    background:none;
+    border:0;
+    color:#fff;
+    font-size:26px;
+    line-height:1;
+    cursor:pointer
+  }
+  .resep-body{
+    padding:16px 20px 22px;
+    font-size:14px;
+    line-height:1.5
+  }
+  .resep-info{display:flex;gap:16px;font-size:13px;margin-bottom:14px}
+  .resep-info span{margin-bottom:0}
+  .resep-body h4{font-size:15px;margin:14px 0 6px;color:#E89149}
+  .resep-body ul,.resep-body ol{padding-left:20px}
+
+  /* Gambar di kartu */
+  .card{overflow:hidden;padding:0;justify-content:flex-start}
+  .card-img{
+    width:100%;
+    height:90px;
+    object-fit:cover;
+    display:block;
+    background:#f3e3d3
+  }
+  .card-teks{padding:10px 14px}
+  .heart{text-shadow:0 1px 3px rgba(255,255,255,.9)}
+
+  /* Gambar di pop up */
+  .resep-img{
+    width:100%;
+    max-height:220px;
+    object-fit:cover;
+    display:block;
+    background:#f3e3d3
+  }
+
+</style>
 </head>
+
 <body>
-  <main class="kartu">
+  
+<!-- NAVBAR -->
+<header class="navbar" id="top">
+  <button class="logo-btn" id="logoBtn" aria-label="Kembali ke dashboard"><img src="Logo-Aplikasi.png" width="40px" height="40px"></button>
+  <nav class="nav-right">
+    <ul class="nav-links">
+      <li><a href="dashboard.html" >Dashboard</a></li>
+      <li><a href="kategori.html" data-nama="Kategori">Kategori</a></li>
+      <li><a href="pencatatan.html">Pencatatan</a></li>
+      <li><a href="perencanaan.html" data-nama="Perencanaan">Perencanaan</a></li>
+    </ul>
+    <div class="user">
+      <button class="user-btn" id="userBtn" aria-haspopup="true" aria-expanded="false" type="button" data-bs-toggle="drawer" data-bs-target="#drawerScrolling" aria-controls="drawerScrolling"><span class="avatar"></span><span>Pengguna</span></button>
 
-    <section class="sambutan">
-      <div class="logo"><img src="Logo-Aplikasi.png" width="150px" height="150px" alt="logo"></div>
-
-      <div class="slide-area">
-        <div class="slide aktif">
-          <h2 class="regis">Selamat Datang Di</h2>
-          <p>Aplikasi Resep dan Menu Masakan Keluarga</p>
-          <p class="tebal">Solusi Kebingungan Kamu</p>
-        </div>
-        <div class="slide">
-          <h2 class="regis">Simpan Resep Favorit</h2>
-          <p class="tebal">Kumpulkan resep andalan keluarga dalam satu tempat.</p>
-        </div>
-        <div class="slide">
-          <h2 class="regis">Atur Menu Harian</h2>
-          <p class="tebal">Susun menu makan seminggu tanpa pusing.</p>
-        </div>
+<dialog class="drawer drawer-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="drawerScrolling" aria-labelledby="drawerScrollingLabel">
+  <div class="drawer-header">
+    <h5 class="drawer-title" id="drawerScrollingLabel">Profil</h5>
+  </div>
+  <div class="drawer-body">
+    <div id="userMenu">
+        <a href="#" id="menuSettings">Pengaturan</a>
+        <a href="login.html" id="menuLogin">Login</a>
+        <a href="#" id="favorit">Favorit</a>
+        <a href="login.html" id="menuLogout">Logout</a>
       </div>
+  </div>
+</dialog>
+    </div>
+  </nav>
+</header>
 
-      <div class="dots" role="tablist" aria-label="Slide sambutan">
-        <button class="dot aktif" aria-label="Slide 1"></button>
-        <button class="dot" aria-label="Slide 2"></button>
-        <button class="dot" aria-label="Slide 3"></button>
-      </div>
+<main>
+  <div class="dashboard">
+      <h1>DASHBOARD RESEP SAYA</h1>
+      <p class="sub">Jelajahi Menu Favorit dan Rekomendasi Makanan</p>
+
+      <h2>FAVORIT</h2>
+      <div class="grid" id="favGrid"></div>
+
+      <h2>REKOMENDASI</h2>
+      <div class="grid" id="recGrid" style="margin-bottom:0"></div>
+    </div>
+
+    <section class="about" id="tentang">
+      <h2>Tentang Kami</h2>
+      <p>Selamat datang di Aplikasi Buku Resep dan Menu Masakan Keluarga — platform digital manajemen dapur pintar yang dirancang untuk membantu Anda mengelola, menyusun, dan merencanakan masakan harian dengan lebih efektif dan efisien.</p>
     </section>
 
-    <section class="form-panel">
-      <h1>Registrasi Akun</h1>
-      <p class="sub">Lengkapi data di bawah ini</p>
-
-      <form id="formRegistrasi" novalidate>
-        <div class="field">
-          <label for="nama">Nama Lengkap :</label>
-          <input type="text" id="nama" name="nama" placeholder="Masukkan Nama Lengkap Anda" autocomplete="name">
-          <div class="pesan-error"></div>
-        </div>
-
-        <div class="field">
-          <label for="username">Username :</label>
-          <input type="text" id="username" name="username" placeholder="Masukkan Username Anda" autocomplete="username">
-          <div class="pesan-error"></div>
-        </div>
-
-        <div class="field">
-          <label for="password">Password :</label>
-          <div class="input-wrap">
-            <input type="password" id="password" name="password" placeholder="Masukkan Password Anda" autocomplete="new-password">
-            <button type="button" class="toggle-pw" data-target="password">Lihat</button>
-          </div>
-          <div class="pesan-error"></div>
-        </div>
-
-        <div class="field">
-          <label class="setuju">
-            <input type="checkbox" id="setuju" name="setuju">
-            <span>Saya setuju dengan syarat dan ketentuan</span>
-          </label>
-          <div class="pesan-error"></div>
-        </div>
-
-        <button type="submit" class="tombol">Daftar</button>
-        <div class="notif" id="notif" role="status"></div>
+    <section class="contact" id="hubungi">
+      <h2>Hubungi Kami</h2>
+      <form id="contactForm">
+        <input type="text" id="cNama" placeholder="Masukkan Nama Anda" required>
+        <input type="email" id="cEmail" placeholder="Masukkan Email Anda" required>
+        <textarea id="cPesan" placeholder="Tuliskan Pesan Anda" required></textarea>
+        <button type="submit">Kirim Pesan</button>
+        <p class="msg" id="formMsg" role="status"></p>
       </form>
-
-      <p class="alihan">Sudah punya akun? <a href="login.html">Login</a></p>
     </section>
+</main>
 
-  </main>
-  <script src="script.js"></script>
+<!-- POP UP DETAIL RESEP -->
+<dialog class="resep-modal" id="resepModal" aria-labelledby="mJudul">
+  <div class="resep-head">
+    <div>
+      <h2 id="mJudul"></h2>
+      <small id="mKat"></small>
+    </div>
+    <button class="resep-tutup" id="mTutup" aria-label="Tutup">&times;</button>
+  </div>
+  <img id="mGambar" class="resep-img" alt="">
+  <div class="resep-body">
+    <div class="resep-info">
+      <span id="mWaktu"></span>
+      <span id="mPorsi"></span>
+    </div>
+    <h4>Bahan-bahan</h4>
+    <ul id="mBahan"></ul>
+    <h4>Langkah Memasak</h4>
+    <ol id="mLangkah"></ol>
+  </div>
+</dialog>
+
+<footer>&copy; Buku Resep dan Menu Masakan Keluarga</footer>
+
+<script>
+  // ===== Data resep favorit dan rekomendasi =====
+  const RESEP = [
+    {id:1, nama:"Nasi Goreng Spesial", kat:"Hidangan Utama", waktu:"20 menit", porsi:"2 porsi",
+     gambar:"img/nasi-goreng.jpg",
+     bahan:["2 piring nasi putih","2 butir telur","3 siung bawang putih","2 siung bawang merah","2 sdm kecap manis","Garam & merica secukupnya","Daun bawang, irisan"],
+     langkah:["Haluskan bawang putih dan bawang merah, lalu tumis hingga harum.","Masukkan telur, orak-arik hingga matang.","Tambahkan nasi, kecap, garam, dan merica. Aduk rata.","Taburi daun bawang, sajikan hangat."]},
+    {id:2, nama:"Ayam Rendang", kat:"Hidangan Utama", waktu:"60 menit", porsi:"4 porsi",
+     gambar:"img/ayam-rendang.jpg",
+     bahan:["500 g ayam, potong","400 ml santan","2 lembar daun jeruk","1 batang serai, memarkan","Bumbu halus: bawang merah, bawang putih, cabai, jahe, lengkuas, kunyit"],
+     langkah:["Tumis bumbu halus bersama serai dan daun jeruk hingga harum.","Masukkan ayam, aduk hingga berubah warna.","Tuang santan, masak dengan api kecil sambil sesekali diaduk.","Masak hingga kuah mengental dan bumbu meresap."]},
+    {id:3, nama:"Risol Kentang", kat:"Cemilan", waktu:"45 menit", porsi:"10 buah",
+     gambar:"img/risol-kentang.jpg",
+     bahan:["3 buah kentang, kukus lalu haluskan","10 lembar kulit risol","1 sdm margarin","Garam, merica, pala secukupnya","Tepung roti untuk melapisi"],
+     langkah:["Campur kentang halus dengan margarin, garam, merica, dan pala.","Isi kulit risol dengan adonan, lipat rapat.","Celupkan ke adonan tepung, lalu gulingkan pada tepung roti.","Goreng hingga kuning keemasan."]},
+    {id:4, nama:"Udang Balado", kat:"Cemilan", waktu:"25 menit", porsi:"3 porsi",
+     gambar:"img/udang-balado.jpg",
+     bahan:["300 g udang, bersihkan","8 cabai merah","3 siung bawang putih","3 siung bawang merah","1 buah tomat","Garam, gula, dan perasan jeruk nipis"],
+     langkah:["Goreng udang sebentar hingga setengah matang, angkat.","Haluskan cabai, bawang, dan tomat, lalu tumis hingga matang.","Masukkan udang, tambahkan garam, gula, dan jeruk nipis.","Aduk rata dan masak hingga bumbu meresap."]},
+    {id:5, nama:"Gulai Pakis", kat:"Sayuran", waktu:"30 menit", porsi:"4 porsi",
+     gambar:"img/gulai-pakis.jpg",
+     bahan:["250 g pakis, potong-potong","300 ml santan","2 lembar daun salam","1 batang serai","Bumbu halus: bawang merah, bawang putih, kunyit, cabai, kemiri"],
+     langkah:["Tumis bumbu halus bersama salam dan serai hingga harum.","Masukkan pakis, aduk sebentar.","Tuang santan dan masak dengan api kecil hingga pakis empuk.","Koreksi rasa, sajikan."]},
+    {id:6, nama:"Pindang Serani Kuah Kuning", kat:"Hidangan Utama", waktu:"40 menit", porsi:"4 porsi",
+     gambar:"img/pindang-serani.jpg",
+     bahan:["1 ekor ikan serani, potong","1 ruas kunyit","3 buah cabai rawit","2 batang serai","1 buah tomat","Belimbing wuluh atau asam jawa","Garam secukupnya"],
+     langkah:["Rebus air bersama serai dan bumbu halus hingga mendidih.","Masukkan ikan, masak dengan api sedang.","Tambahkan tomat, cabai rawit, dan belimbing wuluh.","Masak hingga ikan matang dan kuah beraroma segar."]},
+    {id:7, nama:"Bolu Coklat Lumer", kat:"Makanan Penutup", waktu:"50 menit", porsi:"8 potong",
+     gambar:"img/bolu-coklat.jpg",
+     bahan:["150 g tepung terigu","100 g gula pasir","3 butir telur","100 g dark chocolate","100 g mentega","1 sdt baking powder"],
+     langkah:["Lelehkan coklat dan mentega, dinginkan sebentar.","Kocok telur dan gula hingga mengembang.","Masukkan tepung dan baking powder, lalu campurkan lelehan coklat.","Panggang pada suhu 170°C selama 25–30 menit."]},
+    {id:8, nama:"Asem Bandeng Tradisional", kat:"Hidangan Utama", waktu:"45 menit", porsi:"4 porsi",
+     gambar:"img/asem-bandeng.jpg",
+     bahan:["1 ekor ikan bandeng","3 buah tomat hijau","5 buah cabai rawit","2 batang serai","Asam jawa secukupnya","Bawang merah dan bawang putih"],
+     langkah:["Didihkan air bersama bawang, serai, dan asam jawa.","Masukkan ikan bandeng yang sudah dibersihkan.","Tambahkan tomat dan cabai rawit.","Masak hingga ikan matang dan kuah terasa segar asam."]},
+    {id:9, nama:"Nasi Gudeg", kat:"Hidangan Utama", waktu:"120 menit", porsi:"5 porsi",
+     gambar:"img/nasi-gudeg.jpg",
+     bahan:["500 g nangka muda","500 ml santan","3 lembar daun salam","Gula merah secukupnya","Telur rebus & ayam opsional","Bumbu halus: bawang merah, bawang putih, kemiri, ketumbar"],
+     langkah:["Rebus nangka muda hingga agak empuk, tiriskan.","Tumis bumbu halus, masukkan nangka dan daun salam.","Tuang santan dan gula merah, masak dengan api kecil.","Masak lama hingga kuah menyusut dan warna kecokelatan."]},
+    {id:10, nama:"Martabak Keju", kat:"Makanan Penutup", waktu:"40 menit", porsi:"4 potong",
+     gambar:"img/martabak-keju.jpg",
+     bahan:["250 g tepung terigu","1 sdt ragi instan","1 butir telur","250 ml air","Keju parut","Susu kental manis","Mentega"],
+     langkah:["Campur tepung, ragi, telur, dan air; diamkan 30 menit.","Tuang adonan ke teflon, masak hingga berlubang di permukaan.","Olesi mentega, taburi keju dan susu kental manis.","Lipat, potong, dan sajikan hangat."]}
+  ];
+  const REKOMENDASI = [6,7,8,9,10];
+
+  // ===== Favorit (disimpan di localStorage/database kalau ada) =====
+  let favorit = [1,2,3,4,5];
+  try{
+    const s = localStorage.getItem("favorit");
+    if(s) favorit = JSON.parse(s);
+  }catch(e){}
+  function simpanFavorit(){
+    try{ localStorage.setItem("favorit", JSON.stringify(favorit)); }catch(e){}
+  }
+
+  const $ = id => document.getElementById(id);
+
+  const GAMBAR_DEFAULT = "data:image/svg+xml;utf8," + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200">' +
+    '<rect width="100%" height="100%" fill="#f3e3d3"/>' +
+    '<text x="50%" y="50%" font-size="60" text-anchor="middle" dominant-baseline="middle">🍽</text></svg>'
+  );
+
+  function kartu(r, opsi = {}){
+    const div = document.createElement("div");
+    div.className = "card";
+    div.tabIndex = 0;
+    div.setAttribute("role", "button");
+    div.setAttribute("aria-label", "Lihat detail " + r.nama);
+    div.innerHTML = `
+      <img class="card-img" src="${r.gambar || GAMBAR_DEFAULT}" alt="${r.nama}" loading="lazy">
+      <div class="card-teks"><h3>${r.nama}</h3><small>${r.kat}</small></div>`;
+    // Kalau file gambar tidak ditemukan, pakai gambar pengganti
+    div.querySelector("img").addEventListener("error", e => {
+      e.target.src = GAMBAR_DEFAULT;
+    }, {once:true});
+    if(opsi.heartStatis){
+      div.insertAdjacentHTML("afterbegin", '<span class="heart" aria-label="Favorit">&#10084;</span>');
+    }
+    div.addEventListener("click", () => bukaDetail(r.id));
+    div.addEventListener("keydown", e => {
+      if(e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        bukaDetail(r.id);
+      }
+    });
+    return div;
+  }
+
+
+  function renderDashboard(){
+    const fg = $("favGrid"); fg.innerHTML = "";
+    const daftar = RESEP.filter(r => favorit.includes(r.id));
+    if(!daftar.length){
+      fg.innerHTML = '<p class="empty">Belum ada resep favorit. Buka menu Kategori lalu tekan ikon hati pada resep.</p>';
+    }
+    daftar.forEach(r => fg.appendChild(kartu(r, {heartStatis:true})));
+
+    const rg = $("recGrid"); rg.innerHTML = "";
+    RESEP.filter(r => REKOMENDASI.includes(r.id)).forEach(r => rg.appendChild(kartu(r)));
+  }
+
+  // Klik logo: scroll otomatis ke atas (kembali ke dashboard)
+  $("logoBtn").addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
+
+  // ===== Menu pengguna (Pengaturan & Logout) =====
+  const userBtn = $("userBtn"), userMenu = $("userMenu");
+  userBtn.addEventListener("click", e => {
+    e.stopPropagation();
+    const buka = userMenu.classList.toggle("show");
+    userBtn.setAttribute("aria-expanded", buka);
+  });
+  document.addEventListener("click", () => {
+    userMenu.classList.remove("show");
+    userBtn.setAttribute("aria-expanded", false);
+  });
+  $("menuSettings").addEventListener("click", e => { e.preventDefault(); alert("Halaman Pengaturan (dalam pengembangan)."); });
+  $("menuLogout").addEventListener("click", e => {
+    e.preventDefault();
+    if(confirm("Yakin ingin logout?")){
+      setTimeout(() => (location.href = "login.html"), 1000);
+      alert("Anda telah logout.");
+    }
+  });
+
+  // ===== Pop up detail resep =====
+  const modal = $("resepModal");
+
+  function bukaDetail(id){
+    const r = RESEP.find(x => x.id === id);
+    if(!r) return;
+    $("mJudul").textContent = r.nama;
+    $("mKat").textContent   = r.kat;
+    $("mWaktu").textContent = "⏱ " + r.waktu;
+    $("mPorsi").textContent = "🍽 " + r.porsi;
+    $("mBahan").innerHTML   = r.bahan.map(b => `<li>${b}</li>`).join("");
+    $("mLangkah").innerHTML = r.langkah.map(l => `<li>${l}</li>`).join("");
+    const img = $("mGambar");
+    img.onerror = () => { img.onerror = null; img.src = GAMBAR_DEFAULT; };
+    img.src = r.gambar || GAMBAR_DEFAULT;
+    img.alt = r.nama;
+    modal.showModal();
+    modal.scrollTop = 0;
+  }
+
+  $("mTutup").addEventListener("click", () => modal.close());
+
+  // Klik di luar kotak (area gelap) menutup pop up
+  modal.addEventListener("click", e => {
+    if(e.target === modal) modal.close();
+  });
+
+  renderDashboard();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL" crossorigin="anonymous"></script>
+
 </body>
 </html>
