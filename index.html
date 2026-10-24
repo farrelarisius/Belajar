@@ -164,12 +164,27 @@
   .about{
     background:linear-gradient(#FEE8D6,#fff);
     padding:28px 0 60px;
-    text-align:center
+    text-align: center;
+  }
+  .about .col-md-3 li {
+    list-style: none;
+    display: inline-flex;
+    margin-top: 10px;
+    margin-right: 20px;
+  }
+  .about .col-md-3 a {
+    text-decoration: none;
+    color: #000;
   }
 
-  .about h2{
+  .about .col-md-3 a:hover {
+    color: red;
+  }
+
+  .about h3{
     font-size:24px;
-    margin-bottom:18px
+    margin-bottom:18px;
+    margin-top: 30px;
   }
 
   .about p{
@@ -246,8 +261,7 @@
   /* FOOTER */
   footer{
     background:#E89149;
-    color:#fff;
-    text-align:center;
+    text-align: center;
     padding:20px;
     font-size:13px
   }
@@ -411,11 +425,6 @@
       <div class="grid" id="recGrid" style="margin-bottom:0"></div>
     </div>
 
-    <section class="about" id="tentang">
-      <h2>Tentang Kami</h2>
-      <p>Selamat datang di Aplikasi Buku Resep dan Menu Masakan Keluarga — platform digital manajemen dapur pintar yang dirancang untuk membantu Anda mengelola, menyusun, dan merencanakan masakan harian dengan lebih efektif dan efisien.</p>
-    </section>
-
     <section class="contact" id="hubungi">
       <h2>Hubungi Kami</h2>
       <form id="contactForm">
@@ -450,7 +459,35 @@
   </div>
 </dialog>
 
-<footer>&copy; Buku Resep dan Menu Masakan Keluarga</footer>
+<footer class="about">
+<div class="container">
+<div class="row">
+<div class="col-md-3">
+ <h4>LAYANAN PELANGGAN</h4>
+ <p> Contact Layanan Pelanggan : +62 8000 0000 0000
+ </p>
+ </div>
+ <div class="col-md-3">
+ <h4>TENTANG KAMI</h4>
+ <p>Mahasiswa Politeknik Negeri Batam, Jurusan Teknik Informatika
+ </p>
+ </div>
+ <div class="col-md-3">
+ <h4>MITRA KERJA SAMA</h4>
+ <p><img src="Polibatam Univ Logo baru .png" width="100px" height="100px">
+ </p>
+ </div>
+ <div class="col-md-3">
+ <h4>HUBUNGI KAMI</h4>
+  <ul>
+    <li><a href="#">Instagram</a></li>
+    <li><a href="#">Instagram</a></li>
+  </ul>
+ </div>
+ </div>
+ </div>
+    &copy; Buku Resep dan Menu Masakan Keluarga
+</footer>
 
 <script>
   // ===== Data resep favorit dan rekomendasi =====
