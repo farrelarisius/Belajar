@@ -1,72 +1,498 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title><script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primaryOrange: '#EA580C',
-                        headerOrange: '#F97316',
-                        softCream: '#FEF3C7',
-                        cardCream: '#FFFBEB'
-                    }
-                }
-            }
-        }
-    </script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" >
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
+<link rel="stylesheet" href="kategori.css">
+<style>
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#000}
+
+
+  /* NAVBAR */
+  .navbar{
+    position:sticky;
+    top:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:#E89149;
+    padding:8px 20px;
+    height:60px
+  }
+
+  .logo-btn{
+    border:2px solid #E89149;
+    background:transparent;
+    border-radius:6px;
+    font-weight:700;
+    font-size:15px;
+    color:#fff;
+    cursor:pointer
+  }
+
+  .logo-btn:hover{
+    background:rgba(255,255,255,.15)
+  }
+
+  .nav-right{
+    display:flex;
+    align-items:center;
+    gap:22px
+  }
+
+  .nav-links{
+    display:flex;
+    gap:18px;
+    margin-top: 8px;
+    list-style:none
+  }
+
+  .nav-links a{
+    color:#fff;
+    text-decoration:none;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer
+  }
+
+  .nav-links a:hover,.nav-links a.active{
+    text-decoration:underline
+  }
+  
+  .user{
+    position:relative
+  }
+
+  .user-btn{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:none;
+    border:0;
+    cursor:pointer;
+    color:#fff;
+    font:700 15px Arial,sans-serif
+  }
+
+  span {
+    margin-bottom: 8px;
+  }
+
+  .avatar{
+    width:38px;
+    height:38px;
+    margin-bottom: 10px;
+    border-radius:50%;
+    background:#151515;
+    border:2px solid #fff
+  }
+
+  .dropdown{
+    display:none;
+    position:absolute;
+    right:0;
+    top:50px;
+    min-width:150px;
+    background:#fff;
+    box-shadow:0 4px 12px rgba(0,0,0,.25);
+    z-index:60
+  }
+
+  .dropdown.show{
+    display:block
+  }
+
+  .dropdown a{
+    display:block;
+    padding:12px 16px;
+    color:#000;
+    text-decoration:none;
+    font-size:15px
+  }
+
+  .dropdown a:first-child{
+    border-bottom:2px solid #dcd0ec
+  }
+
+  .dropdown a:hover{
+    background:#f5f5f5
+  }
+
+
+  /* DASHBOARD */
+  .dashboard{
+    background:#FEE8D6;
+    padding:22px 24px 30px
+  }
+
+  .dashboard h1{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:6px
+  }
+
+  .dashboard .sub{
+    font-size:14px;
+    margin-bottom:22px
+  }
+
+  .dashboard h2{
+    font-size:15px;
+    font-weight:700;
+    margin:0 0 10px
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:12px;
+    margin-bottom:28px
+  }
+
+  .card{
+    position:relative;
+    background:#fff;
+    border-radius:18px;
+    min-height:130px;
+    padding:14px 16px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end
+  }
+
+  .card h3{
+    font-size:13px;
+    font-weight:700
+  }
+
+  .card small{
+    font-size:10px;
+    color:#222
+  }
+
+  .heart{
+    position:absolute;
+    top:10px;
+    right:12px;
+    font-size:28px;
+    line-height:1;color:#d90000
+  }
+
+  .empty{
+    grid-column:1/-1;
+    font-size:14px;
+    padding:10px 0
+  }
+
+
+  /* TENTANG KAMI */
+  .about{
+    background:linear-gradient(#FEE8D6,#fff);
+    padding:28px 0 60px;
+    text-align:center
+  }
+
+  .about h2{
+    font-size:24px;
+    margin-bottom:18px
+  }
+
+  .about p{
+    font-size:14px;
+    line-height:1.5;
+    padding:0 6px;
+    text-align:left
+  }
+
+
+  /* HUBUNGI KAMI */
+  .contact{
+    background:#fff;
+    padding:20px 16px 36px;
+    text-align:center
+  }
+
+  .contact h2{
+    font-size:24px;
+    margin-bottom:22px
+  }
+
+  .contact .nama{
+    font-size:14px;
+    margin-bottom:26px
+  }
+
+  .contact form{
+    width:400px;
+    max-width:100%;
+    margin:0 auto
+  }
+
+  .contact input,.contact textarea{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:4px;
+    margin-bottom:10px;
+    font-size:13px
+  }
+  
+  .contact input{
+    font-family:Arial,sans-serif
+  }
+
+  .contact textarea{
+    height:85px;
+    font-family:monospace;
+    resize:vertical
+  }
+
+  .contact button{
+    width:100%;
+    padding:9px;
+    border:0;
+    border-radius:4px;
+    background:#FF6347;
+    color:#fff;
+    font-size:14px;cursor:pointer
+  }
+
+  .contact button:hover{
+    background:#e9553a
+  }
+
+  .msg{
+    margin-top:10px;
+    font-size:13px;
+    color:#1a7f37
+  }
+
+
+  /* FOOTER */
+  footer{
+    background:#E89149;
+    color:#fff;
+    text-align:center;
+    padding:20px;
+    font-size:13px
+  }
+
+  @media(max-width:900px){
+    .grid{grid-template-columns:repeat(2,1fr)}
+    .nav-links{gap:10px}
+    .user-btn span{display:none}
+  }
+  @media(max-width:560px){.nav-links{display:none}}
+  .drawer-body {
+    background-color: #E89149;
+  }
+  #menuLogout:hover {
+    background-color: #d90000;
+  }
+  .userMenu,
+  #menuLogout,
+  #menuSettings {
+    display: block;
+    color: white;
+    margin: 16px;
+    text-decoration: none;
+    align-items: start;
+  }
+  dialog {
+    background-color: #FEE8D6;
+  }
+  .drawer-title {
+    margin-bottom: 20px;
+  }
+  #drawerScrollingLabel {
+    color: #E89149;
+    margin: 15px;
+  }
+</style>
 </head>
+
 <body>
-  <header class="bg-[#F26A1B] text-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            
-            <!-- Logo & Title -->
-            <div class="flex items-center space-x-4">
-                <div class="bg-white text-[#F26A1B] font-bold px-4 py-2 rounded-lg shadow-sm border border-orange-200 tracking-wider">
-                    Logo
-                </div>
-                <h1 class="text-lg sm:text-xl md:text-2xl font-bold tracking-tight">
-                    Buku Resep dan Menu Masakan Keluarga
-                </h1>
-            </div>
+  
+<!-- NAVBAR -->
+<header class="navbar" id="top">
+  <button class="logo-btn" id="logoBtn" aria-label="Kembali ke dashboard"><img src="Logo-Aplikasi.png" width="40px" height="40px"></button>
+  <nav class="nav-right">
+    <ul class="nav-links">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="kategori.html" data-nama="Kategori">Kategori</a></li>
+      <li><a href="pencatatan.html">Pencatatan</a></li>
+      <li><a href="perencanaan.html" data-nama="Perencanaan">Perencanaan</a></li>
+    </ul>
+    <div class="user">
+      <button class="user-btn" id="userBtn" aria-haspopup="true" aria-expanded="false" type="button" data-bs-toggle="drawer" data-bs-target="#drawerScrolling" aria-controls="drawerScrolling"><span class="avatar"></span><span>Pengguna</span></button>
 
+<dialog class="drawer drawer-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="drawerScrolling" aria-labelledby="drawerScrollingLabel">
+  <div class="drawer-header">
+    <h5 class="drawer-title" id="drawerScrollingLabel">Profil</h5>
+  </div>
+  <div class="drawer-body">
+    <div id="userMenu">
+        <a href="#" id="menuSettings">Pengaturan</a>
+        <a href="login.html" id="menuLogout">Logout</a>
+      </div>
+  </div>
+</dialog>
+    </div>
+  </nav>
+  </header>
 
-            <div class="flex items-center space-x-6 md:space-x-8">
-           
-                <nav class="hidden md:flex items-center space-x-6 font-medium text-sm sm:text-base">
-                    <a href="#" class="hover:underline underline-offset-4 decoration-2 font-semibold">Dashboard</a>
-                    <a href="#" class="hover:underline underline-offset-4 decoration-2 opacity-90 hover:opacity-100">Kategori</a>
-                    <a href="#" class="hover:underline underline-offset-4 decoration-2 opacity-90 hover:opacity-100">Pencatatan</a>
-                    <a href="#" class="hover:underline underline-offset-4 decoration-2 opacity-90 hover:opacity-100">Perencanaan</a>
-                </nav>
+  <div class="halaman">
 
-        <!-- Mobile Navigation Menu Bar -->
-        <div class="md:hidden bg-[#E05A12] px-4 py-2 flex justify-around text-xs font-medium border-t border-orange-600">
-            <a href="#" class="hover:underline font-semibold">Dashboard</a>
-            <a href="#" class="hover:underline opacity-90">Kategori</a>
-            <a href="#" class="hover:underline opacity-90">Pencatatan</a>
-            <a href="#" class="hover:underline opacity-90">Perencanaan</a>
+    <main class="konten">
+
+      <!-- Kategori resep -->
+      <section class="bagian-kategori" aria-labelledby="judul-kategori">
+        <div class="kepala-kategori">
+          <div>
+            <h2 id="judul-kategori">KATEGORI RESEP</h2>
+            <p class="subjudul">Jelajahi Resep Terbaik Untuk Hari Ini</p>
+          </div>
+          <a href="#" class="tombol-semua">Semua Kategori</a>
         </div>
-          <li class="nav-item">
-            <button class="nav-link" type="button" data-bs-toggle="menu" align-items="right" aria-expanded="false">
-              <div class="flex items-center space-x-2 bg-orange-700/30 px-3 py-1.5 rounded-full border border-orange-400/30">
-                    <div class="w-8 h-8 rounded-full bg-neutral-900 text-white flex items-center justify-center font-bold text-xs shadow-inner">
-                        👤
-                    </div>
-                    <span class="text-sm font-medium pr-1">Pengguna</span>
-                </div>
-            </button>
-            <div class="menu">
-              <a class="menu-item" href="#">Profil Saya</a>
-              <a class="menu-item" href="#">Pengaturan</a>
-              <a class="menu-item" href="login.html">Log Out</a>
-            </div>
-          </li>
-</header>
+
+        <ul class="grid-kategori">
+          <li><a href="#" class="kartu"><span class="kartu-nama">Hidangan Utama</span><span class="kartu-jumlah">10 Resep</span></a></li>
+          <li><a href="#" class="kartu"><span class="kartu-nama">Ayam</span><span class="kartu-jumlah">15 Resep</span></a></li>
+          <li><a href="#" class="kartu"><span class="kartu-nama">Nasi</span><span class="kartu-jumlah">21 Resep</span></a></li>
+          <li><a href="#" class="kartu"><span class="kartu-nama">Seafood</span><span class="kartu-jumlah">21 Resep</span></a></li>
+          <li><a href="#" class="kartu"><span class="kartu-nama">Sayuran</span><span class="kartu-jumlah">15 Resep</span></a></li>
+          <li><a href="#" class="kartu"><span class="kartu-nama">Mie</span><span class="kartu-jumlah">15 Resep</span></a></li>
+          <li><a href="#" class="kartu"><span class="kartu-nama">Cemilan</span><span class="kartu-jumlah">10 Resep</span></a></li>
+          <li><a href="#" class="kartu"><span class="kartu-nama">Makanan Penutup</span><span class="kartu-jumlah">15 Resep</span></a></li>
+          <li><a href="#" class="kartu"><span class="kartu-nama">Sup</span><span class="kartu-jumlah">21 Resep</span></a></li>
+          <li><a href="#" class="kartu"><span class="kartu-nama">Ikan</span><span class="kartu-jumlah">21 Resep</span></a></li>
+        </ul>
+      </section>
+
+      <!-- Pencarian resep -->
+      <section class="bagian-pencarian" aria-labelledby="judul-pencarian">
+        <h2 id="judul-pencarian">CARI KATEGORI</h2>
+
+        <form class="form-cari" role="search" action="#" method="get">
+          <label for="kolom-cari" class="sr-only">Cari resep</label>
+          <input type="search" id="kolom-cari" name="q" autocomplete="off">
+          <button type="submit">Cari</button>
+        </form>
+
+        <h3 class="judul-riwayat">Pencarian sebelumnya</h3>
+        <ul class="riwayat">
+          <li><a href="#">Ayam</a></li>
+          <li><a href="#">Cemilan</a></li>
+          <li><a href="#">Cepat Saji</a></li>
+        </ul>
+      </section>
+
+    </main>
+  </div>
+
+  <footer>&copy; Buku Resep dan Menu Masakan Keluarga</footer>
+
+<script>
+  // ===== Data resep favorit dan rekomendasi =====
+  const RESEP = [
+    {id:1, nama:"Nasi Goreng Spesial", kat:"Hidangan Utama"},
+    {id:2, nama:"Ayam Rendang", kat:"Hidangan Utama"},
+    {id:3, nama:"Risol Kentang", kat:"Cemilan"},
+    {id:4, nama:"Udang Balado", kat:"Cemilan"},
+    {id:5, nama:"Gulai Pakis", kat:"Sayuran"},
+    {id:6, nama:"Pindang Serani Kuah Kuning", kat:"Hidangan Utama"},
+    {id:7, nama:"Bolu Coklat Lumer", kat:"Makanan Penutup"},
+    {id:8, nama:"Asem Bandeng Tradisional", kat:"Hidangan Utama"},
+    {id:9, nama:"Nasi Gudeg", kat:"Hidangan Utama"},
+    {id:10, nama:"Martabak Keju", kat:"Makanan Penutup"}
+  ];
+  const REKOMENDASI = [6,7,8,9,10];
+
+  // ===== Favorit (disimpan di localStorage/database kalau ada) =====
+  let favorit = [1,2,3,4,5];
+  try{
+    const s = localStorage.getItem("favorit");
+    if(s) favorit = JSON.parse(s);
+  }catch(e){}
+  function simpanFavorit(){
+    try{ localStorage.setItem("favorit", JSON.stringify(favorit)); }catch(e){}
+  }
+
+  const $ = id => document.getElementById(id);
+
+  function kartu(r, opsi = {}){
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `<h3>${r.nama}</h3><small>${r.kat}</small>`;
+    if(opsi.heartStatis){
+      div.insertAdjacentHTML("afterbegin", '<span class="heart" aria-label="Favorit">&#10084;</span>');
+    }
+    return div;
+  }
+
+
+  function renderDashboard(){
+    const fg = $("favGrid"); fg.innerHTML = "";
+    const daftar = RESEP.filter(r => favorit.includes(r.id));
+    if(!daftar.length){
+      fg.innerHTML = '<p class="empty">Belum ada resep favorit. Buka menu Kategori lalu tekan ikon hati pada resep.</p>';
+    }
+    daftar.forEach(r => fg.appendChild(kartu(r, {heartStatis:true})));
+
+    const rg = $("recGrid"); rg.innerHTML = "";
+    RESEP.filter(r => REKOMENDASI.includes(r.id)).forEach(r => rg.appendChild(kartu(r)));
+  }
+
+  // Klik logo: scroll otomatis ke atas (kembali ke dashboard)
+  $("logoBtn").addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
+
+  // ===== Menu pengguna (Pengaturan & Logout) =====
+  const userBtn = $("userBtn"), userMenu = $("userMenu");
+  userBtn.addEventListener("click", e => {
+    e.stopPropagation();
+    const buka = userMenu.classList.toggle("show");
+    userBtn.setAttribute("aria-expanded", buka);
+  });
+  document.addEventListener("click", () => {
+    userMenu.classList.remove("show");
+    userBtn.setAttribute("aria-expanded", false);
+  });
+  $("menuSettings").addEventListener("click", e => { e.preventDefault(); alert("Halaman Pengaturan (dalam pengembangan)."); });
+  $("menuLogout").addEventListener("click", e => {
+    e.preventDefault();
+    if(confirm("Yakin ingin logout?")){
+      setTimeout(() => (location.href = "login.html"), 1000);
+      alert("Anda telah logout.");
+    }
+  });
+
+  // ===== Form Hubungi Kami =====
+  $("contactForm").addEventListener("submit", e => {
+    e.preventDefault();
+    $("formMsg").textContent = "Pesan terkirim. Terima kasih, " + $("cNama").value + "!";
+    e.target.reset();
+  });
+
+
+  // Menu yang belum tersedia
+  document.querySelectorAll(".soon").forEach(a => a.addEventListener("click", e => {
+    e.preventDefault();
+    alert("Halaman " + a.dataset.nama + " dalam pengembangan.");
+  }));
+
+  renderDashboard();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL" crossorigin="anonymous"></script>
+
 </body>
 </html>

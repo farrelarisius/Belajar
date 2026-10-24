@@ -1,262 +1,465 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Buku Resep dan Menu Masakan Keluarga</title>
-     <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primaryOrange: '#EA580C',
-                        headerOrange: '#F97316',
-                        softCream: '#FEF3C7',
-                        cardCream: '#FFFBEB'
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .drawer-body {
-            background-color: #E89149;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" >
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
+<style>
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#000}
+
+
+  /* NAVBAR */
+  .navbar{
+    position:sticky;
+    top:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:#E89149;
+    padding:8px 20px;
+    height:60px
+  }
+
+  .logo-btn{
+    border:2px solid #E89149;
+    background:transparent;
+    border-radius:6px;
+    font-weight:700;
+    font-size:15px;
+    color:#fff;
+    cursor:pointer
+  }
+
+  .logo-btn:hover{
+    background:rgba(255,255,255,.15)
+  }
+
+  .nav-right{
+    display:flex;
+    align-items:center;
+    gap:22px
+  }
+
+  .nav-links{
+    display:flex;
+    gap:18px;
+    margin-top: 8px;
+    list-style:none
+  }
+
+  .nav-links a{
+    color:#fff;
+    text-decoration:none;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer
+  }
+
+  .nav-links a:hover,.nav-links a.active{
+    text-decoration:underline
+  }
+  
+  .user{
+    position:relative
+  }
+
+  .user-btn{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:none;
+    border:0;
+    cursor:pointer;
+    color:#fff;
+    font:700 15px Arial,sans-serif
+  }
+
+  span {
+    margin-bottom: 8px;
+  }
+
+  .avatar{
+    width:38px;
+    height:38px;
+    margin-bottom: 10px;
+    border-radius:50%;
+    background:#151515;
+    border:2px solid #fff
+  }
+
+  .dropdown{
+    display:none;
+    position:absolute;
+    right:0;
+    top:50px;
+    min-width:150px;
+    background:#fff;
+    box-shadow:0 4px 12px rgba(0,0,0,.25);
+    z-index:60
+  }
+
+  .dropdown.show{
+    display:block
+  }
+
+  .dropdown a{
+    display:block;
+    padding:12px 16px;
+    color:#000;
+    text-decoration:none;
+    font-size:15px
+  }
+
+  .dropdown a:first-child{
+    border-bottom:2px solid #dcd0ec
+  }
+
+  .dropdown a:hover{
+    background:#f5f5f5
+  }
+
+
+  /* DASHBOARD */
+  .dashboard{
+    background:#FEE8D6;
+    padding:22px 24px 30px
+  }
+
+  .dashboard h1{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:6px
+  }
+
+  .dashboard .sub{
+    font-size:14px;
+    margin-bottom:22px
+  }
+
+  .dashboard h2{
+    font-size:15px;
+    font-weight:700;
+    margin:0 0 10px
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:12px;
+    margin-bottom:28px
+  }
+
+  .card{
+    position:relative;
+    background:#fff;
+    border-radius:18px;
+    min-height:130px;
+    padding:14px 16px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end
+  }
+
+  .card h3{
+    font-size:13px;
+    font-weight:700
+  }
+
+  .card small{
+    font-size:10px;
+    color:#222
+  }
+
+  .heart{
+    position:absolute;
+    top:10px;
+    right:12px;
+    font-size:28px;
+    line-height:1;color:#d90000
+  }
+
+  .empty{
+    grid-column:1/-1;
+    font-size:14px;
+    padding:10px 0
+  }
+
+
+  /* TENTANG KAMI */
+  .about{
+    background:linear-gradient(#FEE8D6,#fff);
+    padding:28px 0 60px;
+    text-align:center
+  }
+
+  .about h2{
+    font-size:24px;
+    margin-bottom:18px
+  }
+
+  .about p{
+    font-size:14px;
+    line-height:1.5;
+    padding:0 6px;
+    text-align:left
+  }
+
+
+  /* HUBUNGI KAMI */
+  .contact{
+    background:#fff;
+    padding:20px 16px 36px;
+    text-align:center
+  }
+
+  .contact h2{
+    font-size:24px;
+    margin-bottom:22px
+  }
+
+  .contact .nama{
+    font-size:14px;
+    margin-bottom:26px
+  }
+
+  .contact form{
+    width:400px;
+    max-width:100%;
+    margin:0 auto
+  }
+
+  .contact input,.contact textarea{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:4px;
+    margin-bottom:10px;
+    font-size:13px
+  }
+  
+  .contact input{
+    font-family:Arial,sans-serif
+  }
+
+  .contact textarea{
+    height:85px;
+    font-family:monospace;
+    resize:vertical
+  }
+
+  .contact button{
+    width:100%;
+    padding:9px;
+    border:0;
+    border-radius:4px;
+    background:#FF6347;
+    color:#fff;
+    font-size:14px;cursor:pointer
+  }
+
+  .contact button:hover{
+    background:#e9553a
+  }
+
+  .msg{
+    margin-top:10px;
+    font-size:13px;
+    color:#1a7f37
+  }
+
+
+  /* FOOTER */
+  footer{
+    background:#E89149;
+    color:#fff;
+    text-align:center;
+    padding:20px;
+    font-size:13px
+  }
+
+  @media(max-width:900px){
+    .grid{grid-template-columns:repeat(2,1fr)}
+    .nav-links{gap:10px}
+    .user-btn span{display:none}
+  }
+  @media(max-width:560px){.nav-links{display:none}}
+  .drawer-body {
+    background-color: #E89149;
+  }
+  #menuLogout:hover {
+    background-color: #d90000;
+    text-decoration: underline;
+  }
+  .userMenu,
+  #menuLogout,
+  #menuSettings {
+    display: block;
+    color: white;
+    margin: 16px;
+    text-decoration: none;
+    align-items: start;
+  }
+  dialog {
+    background-color: #FEE8D6;
+  }
+  .drawer-title {
+    margin-bottom: 20px;
+  }
+  #drawerScrollingLabel {
+    color: #E89149;
+    margin: 15px;
+  }
+
+</style>
 </head>
-<body class="bg-[#FDF6E2] min-h-screen text-neutral-800">
 
-    <!-- 1. HEADER -->
-    <header class="bg-[#F26A1B] text-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            
-            <!-- Logo & Title -->
-            <div class="flex items-center space-x-4">
-                <div class="bg-white text-[#F26A1B] font-bold px-4 py-2 rounded-lg shadow-sm border border-orange-200 tracking-wider">
-                    Logo
-                </div>
-                <h1 class="text-lg sm:text-xl md:text-2xl font-bold tracking-tight">
-                    Buku Resep dan Menu Masakan Keluarga
-                </h1>
-            </div>
-
-            <!-- Navigation & Profile -->
-            <div class="flex items-center space-x-6 md:space-x-8">
-                <!-- Nav Links (Hidden on small mobile) -->
-                <nav class="hidden md:flex items-center space-x-6 font-medium text-sm sm:text-base">
-                    <a href="#" class="hover:underline underline-offset-4 decoration-2 font-semibold">Dashboard</a>
-                    <a href="#" class="hover:underline underline-offset-4 decoration-2 opacity-90 hover:opacity-100">Kategori</a>
-                    <a href="#" class="hover:underline underline-offset-4 decoration-2 opacity-90 hover:opacity-100">Pencatatan</a>
-                    <a href="#" class="hover:underline underline-offset-4 decoration-2 opacity-90 hover:opacity-100">Perencanaan</a>
-                </nav>
-
-                <!-- Profile -->
-                <li class="nav-item">
-            <button class="nav-link" type="button" data-bs-toggle="menu" align-items="right" aria-expanded="false">
-              
-            </button>
-            <button class="btn-solid theme-primary" type="button" data-bs-toggle="drawer" data-bs-target="#drawerScrolling" aria-controls="drawerScrolling"><div class="flex items-center space-x-2 bg-orange-700/30 px-3 py-1.5 rounded-full border border-orange-400/30">
-                    <div class="w-8 h-8 rounded-full bg-neutral-900 text-white flex items-center justify-center font-bold text-xs shadow-inner">
-                        👤
-                    </div>
-                    <span class="text-sm font-medium pr-1">Pengguna</span>
-                </div></button>
+<body>
+  
+<!-- NAVBAR -->
+<header class="navbar" id="top">
+  <button class="logo-btn" id="logoBtn" aria-label="Kembali ke dashboard"><img src="Logo-Aplikasi.png" width="40px" height="40px"></button>
+  <nav class="nav-right">
+    <ul class="nav-links">
+      <li><a href="dashboard.html" >Dashboard</a></li>
+      <li><a href="kategori.html" data-nama="Kategori">Kategori</a></li>
+      <li><a href="pencatatan.html">Pencatatan</a></li>
+      <li><a href="perencanaan.html" data-nama="Perencanaan">Perencanaan</a></li>
+    </ul>
+    <div class="user">
+      <button class="user-btn" id="userBtn" aria-haspopup="true" aria-expanded="false" type="button" data-bs-toggle="drawer" data-bs-target="#drawerScrolling" aria-controls="drawerScrolling"><span class="avatar"></span><span>Pengguna</span></button>
 
 <dialog class="drawer drawer-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="drawerScrolling" aria-labelledby="drawerScrollingLabel">
   <div class="drawer-header">
-    <h5 class="drawer-title" id="drawerScrollingLabel">Pengaturan</h5>
+    <h5 class="drawer-title" id="drawerScrollingLabel">Profil</h5>
   </div>
   <div class="drawer-body">
-    <a href="#" class="hover:underline font-semibold">Akun Anda</a>
-            <a href="#" class="hover:underline opacity-90">Favorit</a>
-            <a href="#" class="hover:underline opacity-90">Pencatatan</a>
-            <a href="login.html" class="hover:underline opacity-90">Log Out</a>
+    <div id="userMenu">
+        <a href="#" id="menuSettings">Pengaturan</a>
+        <a href="login.html" id="menuLogout">Logout</a>
+      </div>
   </div>
 </dialog>
-          </li>
-            </div>
-        </div>
+    </div>
+  </nav>
+</header>
 
-        <!-- Mobile Navigation Menu Bar -->
-        <div class="md:hidden bg-[#E05A12] px-4 py-2 flex justify-around text-xs font-medium border-t border-orange-600">
-            <a href="#" class="hover:underline font-semibold">Dashboard</a>
-            <a href="#" class="hover:underline opacity-90">Kategori</a>
-            <a href="#" class="hover:underline opacity-90">Pencatatan</a>
-            <a href="#" class="hover:underline opacity-90">Perencanaan</a>
-        </div>
-    </header>
+<main>
+  <div class="dashboard">
+      <h1>DASHBOARD RESEP SAYA</h1>
+      <p class="sub">Jelajahi Menu Favorit dan Rekomendasi Makanan</p>
 
-    <!-- MAIN CONTENT CONTAINER -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <!-- DASHBOARD TITLE SECTION -->
-        <div class="mb-8">
-            <h2 class="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-neutral-900 mb-1">
-                DASHBOARD RESEP SAYA
-            </h2>
-            <p class="text-sm sm:text-base text-neutral-600">
-                Jelajahi Menu Favorit dan Rekomendasi Makanan
-            </p>
-        </div>
+      <h2>FAVORIT</h2>
+      <div class="grid" id="favGrid"></div>
 
-        <!-- SECTION: FAVORIT -->
-        <section class="mb-12">
-            <h3 class="text-base sm:text-lg font-bold text-neutral-900 mb-4 tracking-wide uppercase">
-                FAVORIT
-            </h3>
+      <h2>REKOMENDASI</h2>
+      <div class="grid" id="recGrid" style="margin-bottom:0"></div>
+    </div>
 
-            <!-- Grid Container -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                
-                <!-- Card 1: Nasi Goreng Spesial -->
-                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
-                    <div class="absolute top-4 right-4 text-red-600 text-lg cursor-pointer hover:scale-110 transition z-10">
-                        ❤️
-                    </div>
-                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
-                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Nasi+Goreng" alt="Nasi Goreng Spesial" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Nasi Goreng Spesial</h4>
-                        <p class="text-xs text-neutral-500">Hidangan Utama</p>
-                    </div>
-                </div>
+    <section class="about" id="tentang">
+      <h2>Tentang Kami</h2>
+      <p>Selamat datang di Aplikasi Buku Resep dan Menu Masakan Keluarga — platform digital manajemen dapur pintar yang dirancang untuk membantu Anda mengelola, menyusun, dan merencanakan masakan harian dengan lebih efektif dan efisien.</p>
+    </section>
 
-                <!-- Card 2: Ayam Rendang -->
-                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
-                    <div class="absolute top-4 right-4 text-red-600 text-lg cursor-pointer hover:scale-110 transition z-10">
-                        ❤️
-                    </div>
-                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
-                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Ayam+Rendang" alt="Ayam Rendang" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Ayam Rendang</h4>
-                        <p class="text-xs text-neutral-500">Hidangan Utama</p>
-                    </div>
-                </div>
+    <section class="contact" id="hubungi">
+      <h2>Hubungi Kami</h2>
+      <form id="contactForm">
+        <input type="text" id="cNama" placeholder="Masukkan Nama Anda" required>
+        <input type="email" id="cEmail" placeholder="Masukkan Email Anda" required>
+        <textarea id="cPesan" placeholder="Tuliskan Pesan Anda" required></textarea>
+        <button type="submit">Kirim Pesan</button>
+        <p class="msg" id="formMsg" role="status"></p>
+      </form>
+    </section>
+</main>
 
-                <!-- Card 3: Risol Kentang -->
-                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
-                    <div class="absolute top-4 right-4 text-red-600 text-lg cursor-pointer hover:scale-110 transition z-10">
-                        ❤️
-                    </div>
-                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
-                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Risol+Kentang" alt="Risol Kentang" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Risol Kentang</h4>
-                        <p class="text-xs text-neutral-500">Cemilan</p>
-                    </div>
-                </div>
+<footer>&copy; Buku Resep dan Menu Masakan Keluarga</footer>
 
-                <!-- Card 4: Udang Balado -->
-                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
-                    <div class="absolute top-4 right-4 text-red-600 text-lg cursor-pointer hover:scale-110 transition z-10">
-                        ❤️
-                    </div>
-                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
-                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Udang+Balado" alt="Udang Balado" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Udang Balado</h4>
-                        <p class="text-xs text-neutral-500">Cemilan</p>
-                    </div>
-                </div>
+<script>
+  // ===== Data resep favorit dan rekomendasi =====
+  const RESEP = [
+    {id:1, nama:"Nasi Goreng Spesial", kat:"Hidangan Utama"},
+    {id:2, nama:"Ayam Rendang", kat:"Hidangan Utama"},
+    {id:3, nama:"Risol Kentang", kat:"Cemilan"},
+    {id:4, nama:"Udang Balado", kat:"Cemilan"},
+    {id:5, nama:"Gulai Pakis", kat:"Sayuran"},
+    {id:6, nama:"Pindang Serani Kuah Kuning", kat:"Hidangan Utama"},
+    {id:7, nama:"Bolu Coklat Lumer", kat:"Makanan Penutup"},
+    {id:8, nama:"Asem Bandeng Tradisional", kat:"Hidangan Utama"},
+    {id:9, nama:"Nasi Gudeg", kat:"Hidangan Utama"},
+    {id:10, nama:"Martabak Keju", kat:"Makanan Penutup"}
+  ];
+  const REKOMENDASI = [6,7,8,9,10];
 
-                <!-- Card 5: Gulai Pakis -->
-                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
-                    <div class="absolute top-4 right-4 text-red-600 text-lg cursor-pointer hover:scale-110 transition z-10">
-                        ❤️
-                    </div>
-                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
-                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Gulai+Pakis" alt="Gulai Pakis" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Gulai Pakis</h4>
-                        <p class="text-xs text-neutral-500">Sayuran</p>
-                    </div>
-                </div>
+  // ===== Favorit (disimpan di localStorage/database kalau ada) =====
+  let favorit = [1,2,3,4,5];
+  try{
+    const s = localStorage.getItem("favorit");
+    if(s) favorit = JSON.parse(s);
+  }catch(e){}
+  function simpanFavorit(){
+    try{ localStorage.setItem("favorit", JSON.stringify(favorit)); }catch(e){}
+  }
 
-            </div>
-        </section>
+  const $ = id => document.getElementById(id);
 
-        <!-- SECTION: REKOMENDASI -->
-        <section class="mb-12">
-            <h3 class="text-base sm:text-lg font-bold text-neutral-900 mb-4 tracking-wide uppercase">
-                REKOMENDASI
-            </h3>
+  function kartu(r, opsi = {}){
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `<h3>${r.nama}</h3><small>${r.kat}</small>`;
+    if(opsi.heartStatis){
+      div.insertAdjacentHTML("afterbegin", '<span class="heart" aria-label="Favorit">&#10084;</span>');
+    }
+    return div;
+  }
 
-            <!-- Grid Container -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                
-                <!-- Card 1: Pindang Serani Kuah Kuning -->
-                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
-                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
-                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Pindang+Serani" alt="Pindang Serani Kuah Kuning" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Pindang Serani Kuah Kuning</h4>
-                        <p class="text-xs text-neutral-500">Hidangan Utama</p>
-                    </div>
-                </div>
 
-                <!-- Card 2: Bolu Coklat Lumer -->
-                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
-                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
-                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Bolu+Coklat" alt="Bolu Coklat Lumer" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Bolu Coklat Lumer</h4>
-                        <p class="text-xs text-neutral-500">Makanan Penutup</p>
-                    </div>
-                </div>
+  function renderDashboard(){
+    const fg = $("favGrid"); fg.innerHTML = "";
+    const daftar = RESEP.filter(r => favorit.includes(r.id));
+    if(!daftar.length){
+      fg.innerHTML = '<p class="empty">Belum ada resep favorit. Buka menu Kategori lalu tekan ikon hati pada resep.</p>';
+    }
+    daftar.forEach(r => fg.appendChild(kartu(r, {heartStatis:true})));
 
-                <!-- Card 3: Asem Bandeng Tradisional -->
-                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
-                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
-                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Asem+Bandeng" alt="Asem Bandeng Tradisional" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Asem Bandeng Tradisional</h4>
-                        <p class="text-xs text-neutral-500">Hidangan Utama</p>
-                    </div>
-                </div>
+    const rg = $("recGrid"); rg.innerHTML = "";
+    RESEP.filter(r => REKOMENDASI.includes(r.id)).forEach(r => rg.appendChild(kartu(r)));
+  }
 
-                <!-- Card 4: Nasi Gudeg -->
-                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
-                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
-                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Nasi+Gudeg" alt="Nasi Gudeg" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Nasi Gudeg</h4>
-                        <p class="text-xs text-neutral-500">Hidangan Utama</p>
-                    </div>
-                </div>
+  // Klik logo: scroll otomatis ke atas (kembali ke dashboard)
+  $("logoBtn").addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
 
-                <!-- Card 5: Martabak Keju -->
-                <div class="bg-white rounded-2xl shadow-sm p-3 relative flex flex-col justify-between hover:shadow-md transition duration-200 border border-neutral-100">
-                    <div class="w-full h-32 bg-neutral-100 rounded-xl mb-3 flex items-center justify-center text-neutral-400 text-xs overflow-hidden">
-                        <img src="https://placehold.co/200x130/F3F4F6/9CA3AF?text=Martabak+Keju" alt="Martabak Keju" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/200x130/F3F4F6/9CA3AF?text=Foto+Resep'">
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-sm text-neutral-900 leading-tight mb-1">Martabak Keju</h4>
-                        <p class="text-xs text-neutral-500">Makanan Penutup</p>
-                    </div>
-                </div>
+  // ===== Menu pengguna (Pengaturan & Logout) =====
+  const userBtn = $("userBtn"), userMenu = $("userMenu");
+  userBtn.addEventListener("click", e => {
+    e.stopPropagation();
+    const buka = userMenu.classList.toggle("show");
+    userBtn.setAttribute("aria-expanded", buka);
+  });
+  document.addEventListener("click", () => {
+    userMenu.classList.remove("show");
+    userBtn.setAttribute("aria-expanded", false);
+  });
+  $("menuSettings").addEventListener("click", e => { e.preventDefault(); alert("Halaman Pengaturan (dalam pengembangan)."); });
+  $("menuLogout").addEventListener("click", e => {
+    e.preventDefault();
+    if(confirm("Yakin ingin logout?")){
+      setTimeout(() => (location.href = "login.html"), 1000);
+      alert("Anda telah logout.");
+    }
+  });
 
-            </div>
-        </section>
+  renderDashboard();
+</script>
 
-    </main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL" crossorigin="anonymous"></script>
+
 </body>
 </html>

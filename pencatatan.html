@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pencatatan</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" >
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
+
+
+<style>
+  *{
+    box-sizing:border-box;
+    margin:0;
+    padding:0
+  }
+
+  html{
+    scroll-behavior:smooth
+  }
+
+  body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#FEE8D6;
+    color:#000
+  }
+
+
+  /* NAVBAR */
+  .navbar{
+    position:sticky;
+    top:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:#E89149;
+    padding:8px 20px;
+    height:60px
+  }
+
+  .logo-btn{
+    border:2px solid #E89149;
+    background:transparent;
+    border-radius:6px;
+    font-weight:700;
+    font-size:15px;
+    color:#fff;
+    cursor:pointer
+  }
+
+  .logo-btn:hover{
+    background:rgba(255,255,255,.15)
+  }
+
+  .nav-right{
+    display:flex;
+    align-items:center;
+    gap:22px
+  }
+
+  .nav-links{
+    display:flex;
+    gap:18px;
+    margin-top: 8px;
+    list-style:none
+  }
+
+  .nav-links a{
+    color:#fff;
+    text-decoration:none;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer
+  }
+
+  .nav-links a:hover,.nav-links a.active{
+    text-decoration:underline
+  }
+  
+  .user{
+    position:relative
+  }
+
+  .user-btn{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:none;
+    border:0;
+    cursor:pointer;
+    color:#fff;
+    font:700 15px Arial,sans-serif
+  }
+
+  span {
+    margin-bottom: 8px;
+  }
+
+  .avatar{
+    width:38px;
+    height:38px;
+    margin-bottom: 10px;
+    border-radius:50%;
+    background:#151515;
+    border:2px solid #fff
+  }
+
+  .dropdown{
+    display:none;
+    position:absolute;
+    right:0;
+    top:50px;
+    min-width:150px;
+    background:#fff;
+    box-shadow:0 4px 12px rgba(0,0,0,.25);
+    z-index:60
+  }
+
+  .dropdown.show{
+    display:block
+  }
+
+  .dropdown a{
+    display:block;
+    padding:12px 16px;
+    color:#000;
+    text-decoration:none;
+    font-size:15px
+  }
+
+  .dropdown a:first-child{
+    border-bottom:2px solid #dcd0ec
+  }
+
+  .dropdown a:hover{
+    background:#f5f5f5
+  }
+
+
+  /* FOOTER */
+  footer{
+    background:#E89149;
+    color:#fff;
+    text-align:center;
+    margin-top: 100px;
+    padding:20px;
+    font-size:13px
+  }
+
+
+  /* PENCATATAN */
+  .note-wrap{
+    display:grid;
+    grid-template-columns:1fr 1.2fr;
+    gap:20px;
+    align-items:start
+  }
+
+  .panel{
+    background:#fff;
+    padding:12px 10px 16px
+  }
+
+  .panel>label{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    margin:8px 0 5px
+  }
+
+  .two label{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    margin:8px 0 5px
+  }
+
+  .field{
+    width:100%;
+    background:#FDCF9E;
+    color: black;
+    border:0;
+    border-radius:4px;
+    padding:8px;
+    font-size:13px;
+    font-family:Arial,sans-serif
+  }
+
+  .field:focus{
+    outline:2px solid #E8690F
+  }
+
+  textarea.field{
+    resize:vertical
+  }
+
+  .foto-wrap{
+    position:relative;
+    width:78px;
+    height:98px;
+    margin-bottom:4px
+  }
+
+  .foto{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    width:78px;
+    height:98px;
+    background:#FDCF9E;
+    border:2px dashed #E8690F;
+    border-radius:16px;
+    cursor:pointer;
+    color:#E8690F;
+    overflow:hidden;
+    margin:0!important
+  }
+
+  .foto b{
+    font-size:36px;
+    line-height:1
+  }
+
+  .foto small{
+    font-size:10px;
+    font-weight:700
+  }
+
+  .foto:hover{
+    background:#fbc386
+  }
+
+  .plus-badge{
+    display:none;
+    position:absolute;
+    right:-8px;
+    bottom:-8px;
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    background:#E8690F;
+    color: white;
+    font-size:20px;
+    line-height:26px;
+    text-align:center;
+    pointer-events:none
+  }
+
+  .plus-badge.show{
+    display:block
+  }
+
+  .foto img{
+    width:100%;
+    height:100%;
+    object-fit:cover
+  }
+
+  .two{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0 22px
+  }
+
+  .grup{
+    margin-bottom:14px
+  }
+
+  .grup-head{
+    display:grid;
+    grid-template-columns:auto 1fr 90px;
+    gap:12px;
+    align-items:center;
+    background:#FDCF9E;
+    padding:6px 10px;
+    border-radius:4px;
+    font-size:12px;
+    font-weight:700
+  }
+
+  .grup-head input{
+    background:#fff;
+    color: black;
+    border:0;
+    border-radius:3px;
+    padding:5px;
+    font-size:13px
+  }
+
+  .bahan-row{
+    display:grid;
+    grid-template-columns:1fr 70px;
+    gap:12px;
+    margin:8px 0 0 20px
+  }
+
+  .bahan-row input{
+    background:#FDCF9E;
+    border:0;
+    border-radius:3px;
+    padding:7px;
+    font-size:13px
+  }
+
+  .mini{
+    background:#E8690F;
+    border:0;
+    border-radius:3px;
+    padding:5px 12px;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    margin:8px 0 0 20px
+  }
+
+  .actions{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    margin:8px 0 0 20px
+  }
+
+  .actions .mini{
+    margin:0
+  }
+
+  .actions .hapus{
+    margin-left:auto;
+    background:#f3b3a6
+  }
+
+  .mini:disabled{
+    opacity:.4;
+    cursor:not-allowed
+  }
+
+  .right{
+    text-align:right
+  }
+
+  .right .mini{
+    margin-right:0
+  }
+
+  .save-row{
+    grid-column:1/-1;
+    text-align:right
+  }
+  
+  .save{
+    background:#E8690F;
+    color:#fff;
+    border:0;
+    padding:6px 36px;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer
+  }
+
+.page h1 {
+  font-size: 18px;
+  font-weight: 700;
+  padding-top: 20px; 
+  margin-left: 20px;
+  margin-bottom: 10px;
+}
+
+  @media(max-width:760px)
+  {.note-wrap{grid-template-columns:1fr}}
+
+  @media(max-width:900px){
+    .grid{grid-template-columns:repeat(2,1fr)}
+    .nav-links{gap:10px}
+    .user-btn span{display:none}
+  }
+
+  .drawer-body {
+    background-color: #E89149;
+  }
+  #menuLogout:hover {
+    background-color: #d90000;
+    text-decoration: underline;
+  }
+  .userMenu,
+  #menuLogout,
+  #menuSettings {
+    display: block;
+    color: white;
+    margin: 16px;
+    text-decoration: none;
+    align-items: start;
+  }
+  dialog {
+    background-color: #FEE8D6;
+  }
+  .drawer-title {
+    margin-bottom: 20px;
+  }
+  #drawerScrollingLabel {
+    color: #E89149;
+    margin: 15px;
+  }
+
+  @media(max-width:560px){.nav-links{display:none}}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header class="navbar" id="top">
+  <button class="logo-btn" id="logoBtn" aria-label="Kembali ke dashboard"><img src="Logo-Aplikasi.png" width="40px" height="40px"></button>
+  <nav class="nav-right">
+    <ul class="nav-links">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="kategori.html" data-nama="Kategori">Kategori</a></li>
+      <li><a href="pencatatan.html">Pencatatan</a></li>
+      <li><a href="perencanaan.html" data-nama="Perencanaan">Perencanaan</a></li>
+    </ul>
+    <div class="user">
+      <button class="user-btn" id="userBtn" aria-haspopup="true" aria-expanded="false" type="button" data-bs-toggle="drawer" data-bs-target="#drawerScrolling" aria-controls="drawerScrolling"><span class="avatar"></span><span>Pengguna</span></button>
+
+<dialog class="drawer drawer-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="drawerScrolling" aria-labelledby="drawerScrollingLabel">
+  <div class="drawer-header">
+    <h5 class="drawer-title" id="drawerScrollingLabel">Profil</h5>
+  </div>
+  <div class="drawer-body">
+    <div id="userMenu">
+        <a href="#" id="menuSettings">Pengaturan</a>
+        <a href="login.html" id="menuLogout">Logout</a>
+      </div>
+  </div>
+</dialog>
+  </nav>
+</header>
+
+<main>
+  <div class="page">
+      <h1>PENCATATAN RESEP</h1>
+      <form id="noteForm" class="note-wrap">
+        <div class="panel">
+          <label for="judul">Judul Resep</label>
+          <input class="field" id="judul" required>
+
+          <label>Foto Resep/Makanan</label>
+          <div class="foto-wrap"><label class="foto" id="fotoBox" for="fotoInput" tabindex="0" aria-label="Tambah foto resep"><b>+</b><small>Tambah foto</small></label><span class="plus-badge" id="plusBadge" aria-hidden="true">+</span></div>
+          <input type="file" id="fotoInput" accept="image/*" hidden>
+
+          <div class="two">
+            <div><label for="persiapan">Waktu Persiapan</label><input class="field" id="persiapan" placeholder="mis. 15 menit"></div>
+            <div><label for="memasak">Waktu Memasak</label><input class="field" id="memasak" placeholder="mis. 30 menit"></div>
+            <div><label for="porsi">Porsi</label><input class="field" id="porsi" placeholder="mis. 4 porsi"></div>
+            <div><label for="kesulitan">Kesulitan</label>
+              <select class="field" id="kesulitan"><option>Mudah</option><option>Sedang</option><option>Sulit</option></select></div>
+          </div>
+
+          <label for="catatan">Catatan Tambahan</label>
+          <textarea class="field" id="catatan" rows="3"></textarea>
+        </div>
+
+        <div class="panel">
+          <label>Bahan - bahan</label>
+          <div id="grupList"></div>
+          <div class="right"><button type="button" class="mini" id="addGrup">Tambahkan Grub</button></div>
+        </div>
+        <div class="save-row"><button type="submit" class="save">Simpan</button></div>
+      </form>
+    </div>
+</main>
+
+<footer>&copy; Buku Resep dan Menu Masakan Keluarga</footer>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  // Klik logo: kembali ke dashboard
+  $("logoBtn").addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
+
+  // ===== Menu pengguna (Pengaturan & Logout) =====
+  const userBtn = $("userBtn"), userMenu = $("userMenu");
+  userBtn.addEventListener("click", e => {
+    e.stopPropagation();
+    const buka = userMenu.classList.toggle("show");
+    userBtn.setAttribute("aria-expanded", buka);
+  });
+  document.addEventListener("click", () => {
+    userMenu.classList.remove("show");
+    userBtn.setAttribute("aria-expanded", false);
+  });
+  $("menuSettings").addEventListener("click", e => { e.preventDefault(); alert("Halaman Pengaturan (dalam pengembangan)."); });
+  $("menuLogout").addEventListener("click", e => {
+    e.preventDefault();
+    if(confirm("Yakin ingin logout?")){
+      setTimeout(() => (location.href = "login.html"), 1000);
+      alert("Anda telah logout.");
+    }
+  });
+
+  // ===== Pencatatan resep =====
+  function perbaruiGrup(){
+    const gs = document.querySelectorAll(".grup");
+    gs.forEach((g, i) => {
+      g.querySelector(".gno").textContent = "Grub " + (i + 1);
+      g.querySelector(".nama-grup").setAttribute("aria-label", "Nama grub " + (i + 1));
+      g.querySelector(".hapus").disabled = gs.length === 1;
+      g.querySelector(".kurangi").disabled = g.querySelectorAll(".bahan-row").length <= 1;
+    });
+  }
+  function tambahBahan(g){
+    const r = document.createElement("div");
+    r.className = "bahan-row";
+    r.innerHTML = '<input placeholder="Nama bahan" aria-label="Nama bahan"><input placeholder="Jumlah" aria-label="Kuantitas">';
+    g.querySelector(".rows").appendChild(r);
+    perbaruiGrup();
+  }
+  function kurangiBahan(g){
+    const rows = g.querySelectorAll(".bahan-row");
+    if(rows.length > 1) rows[rows.length - 1].remove();
+    perbaruiGrup();
+  }
+  function tambahGrup(){
+    const g = document.createElement("div");
+    g.className = "grup";
+    g.innerHTML = '<div class="grup-head"><span class="gno"></span><input class="nama-grup"><span>Kuantitas</span></div>' +
+      '<div class="rows"></div>' +
+      '<div class="actions">' +
+        '<button type="button" class="mini tambah">Tambahkan bahan</button>' +
+        '<button type="button" class="mini kurangi">Kurangi bahan</button>' +
+        '<button type="button" class="mini hapus">Hapus Grub</button>' +
+      '</div>';
+    g.querySelector(".tambah").onclick = () => tambahBahan(g);
+    g.querySelector(".kurangi").onclick = () => kurangiBahan(g);
+    g.querySelector(".hapus").onclick = () => { g.remove(); perbaruiGrup(); };
+    $("grupList").appendChild(g);
+    tambahBahan(g); // setiap grub dimulai dengan 1 bahan
+  }
+  $("addGrup").onclick = tambahGrup;
+  tambahGrup();
+
+  $("fotoInput").addEventListener("change", e => {
+    const f = e.target.files[0];
+    if(!f) return;
+    const img = document.createElement("img");
+    img.alt = "Foto resep";
+    img.src = URL.createObjectURL(f);
+    $("fotoBox").replaceChildren(img);
+    $("plusBadge").classList.add("show");
+  });
+  $("fotoBox").addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); $("fotoInput").click(); } });
+
+  $("noteForm").addEventListener("submit", e => {
+    e.preventDefault();
+    // Ganti dengan pengiriman data ke backend proyek kita
+    alert("Resep \"" + $("judul").value + "\" tersimpan.");
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL" crossorigin="anonymous"></script>
+
+</body>
+</html>

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" >
+<link rel="stylesheet" href="perencanaan.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
+<style>
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#000}
+
+
+  /* NAVBAR */
+  .navbar{
+    position:sticky;
+    top:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:#E89149;
+    padding:8px 20px;
+    height:60px
+  }
+
+  .logo-btn{
+    border:2px solid #E89149;
+    background:transparent;
+    border-radius:6px;
+    font-weight:700;
+    font-size:15px;
+    color:#fff;
+    cursor:pointer
+  }
+
+  .logo-btn:hover{
+    background:rgba(255,255,255,.15)
+  }
+
+  .nav-right{
+    display:flex;
+    align-items:center;
+    gap:22px
+  }
+
+  .nav-links{
+    display:flex;
+    gap:18px;
+    margin-top: 8px;
+    list-style:none
+  }
+
+  .nav-links a{
+    color:#fff;
+    text-decoration:none;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer
+  }
+
+  .nav-links a:hover,.nav-links a.active{
+    text-decoration:underline
+  }
+  
+  .user{
+    position:relative
+  }
+
+  .user-btn{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:none;
+    border:0;
+    cursor:pointer;
+    color:#fff;
+    font:700 15px Arial,sans-serif
+  }
+
+  span {
+    margin-bottom: 8px;
+  }
+
+  .avatar{
+    width:38px;
+    height:38px;
+    margin-bottom: 10px;
+    border-radius:50%;
+    background:#151515;
+    border:2px solid #fff
+  }
+
+  .dropdown{
+    display:none;
+    position:absolute;
+    right:0;
+    top:50px;
+    min-width:150px;
+    background:#fff;
+    box-shadow:0 4px 12px rgba(0,0,0,.25);
+    z-index:60
+  }
+
+  .dropdown.show{
+    display:block
+  }
+
+  .dropdown a{
+    display:block;
+    padding:12px 16px;
+    color:#000;
+    text-decoration:none;
+    font-size:15px
+  }
+
+  .dropdown a:first-child{
+    border-bottom:2px solid #dcd0ec
+  }
+
+  .dropdown a:hover{
+    background:#f5f5f5
+  }
+
+
+  /* DASHBOARD */
+  .dashboard{
+    background:#FEE8D6;
+    padding:22px 24px 30px
+  }
+
+  .dashboard h1{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:6px
+  }
+
+  .dashboard .sub{
+    font-size:14px;
+    margin-bottom:22px
+  }
+
+  .dashboard h2{
+    font-size:15px;
+    font-weight:700;
+    margin:0 0 10px
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:12px;
+    margin-bottom:28px
+  }
+
+  .card{
+    position:relative;
+    background:#fff;
+    border-radius:18px;
+    min-height:130px;
+    padding:14px 16px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end
+  }
+
+  .card h3{
+    font-size:13px;
+    font-weight:700
+  }
+
+  .card small{
+    font-size:10px;
+    color:#222
+  }
+
+  .heart{
+    position:absolute;
+    top:10px;
+    right:12px;
+    font-size:28px;
+    line-height:1;color:#d90000
+  }
+
+  .empty{
+    grid-column:1/-1;
+    font-size:14px;
+    padding:10px 0
+  }
+
+
+  /* TENTANG KAMI */
+  .about{
+    background:linear-gradient(#FEE8D6,#fff);
+    padding:28px 0 60px;
+    text-align:center
+  }
+
+  .about h2{
+    font-size:24px;
+    margin-bottom:18px
+  }
+
+  .about p{
+    font-size:14px;
+    line-height:1.5;
+    padding:0 6px;
+    text-align:left
+  }
+
+
+  /* HUBUNGI KAMI */
+  .contact{
+    background:#fff;
+    padding:20px 16px 36px;
+    text-align:center
+  }
+
+  .contact h2{
+    font-size:24px;
+    margin-bottom:22px
+  }
+
+  .contact .nama{
+    font-size:14px;
+    margin-bottom:26px
+  }
+
+  .contact form{
+    width:400px;
+    max-width:100%;
+    margin:0 auto
+  }
+
+  .contact input,.contact textarea{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:4px;
+    margin-bottom:10px;
+    font-size:13px
+  }
+  
+  .contact input{
+    font-family:Arial,sans-serif
+  }
+
+  .contact textarea{
+    height:85px;
+    font-family:monospace;
+    resize:vertical
+  }
+
+  .contact button{
+    width:100%;
+    padding:9px;
+    border:0;
+    border-radius:4px;
+    background:#FF6347;
+    color:#fff;
+    font-size:14px;cursor:pointer
+  }
+
+  .contact button:hover{
+    background:#e9553a
+  }
+
+  .msg{
+    margin-top:10px;
+    font-size:13px;
+    color:#1a7f37
+  }
+
+
+  /* FOOTER */
+  footer{
+    background:#E89149;
+    color:#fff;
+    text-align:center;
+    padding:20px;
+    font-size:13px
+  }
+
+  @media(max-width:900px){
+    .grid{grid-template-columns:repeat(2,1fr)}
+    .nav-links{gap:10px}
+    .user-btn span{display:none}
+  }
+  @media(max-width:560px){.nav-links{display:none}}
+  .drawer-body {
+    background-color: #E89149;
+  }
+  #menuLogout:hover {
+    background-color: #d90000;
+  }
+  .userMenu,
+  #menuLogout,
+  #menuSettings {
+    display: block;
+    color: white;
+    margin: 16px;
+    text-decoration: none;
+    align-items: start;
+  }
+  dialog {
+    background-color: #FEE8D6;
+  }
+  .drawer-title {
+    margin-bottom: 20px;
+  }
+  #drawerScrollingLabel {
+    color: #E89149;
+    margin: 15px;
+  }
+</style>
+</head>
+
+<body>
+  
+<!-- NAVBAR -->
+<header class="navbar" id="top">
+  <button class="logo-btn" id="logoBtn" aria-label="Kembali ke dashboard"><img src="Logo-Aplikasi.png" width="40px" height="40px"></button>
+  <nav class="nav-right">
+    <ul class="nav-links">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="kategori.html" data-nama="Kategori">Kategori</a></li>
+      <li><a href="pencatatan.html">Pencatatan</a></li>
+      <li><a href="perencanaan.html" data-nama="Perencanaan">Perencanaan</a></li>
+    </ul>
+    <div class="user">
+      <button class="user-btn" id="userBtn" aria-haspopup="true" aria-expanded="false" type="button" data-bs-toggle="drawer" data-bs-target="#drawerScrolling" aria-controls="drawerScrolling"><span class="avatar"></span><span>Pengguna</span></button>
+
+<dialog class="drawer drawer-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="drawerScrolling" aria-labelledby="drawerScrollingLabel">
+  <div class="drawer-header">
+    <h5 class="drawer-title" id="drawerScrollingLabel">Profil</h5>
+  </div>
+  <div class="drawer-body">
+    <div id="userMenu">
+        <a href="#" id="menuSettings">Pengaturan</a>
+        <a href="login.html" id="menuLogout">Logout</a>
+      </div>
+  </div>
+</dialog>
+    </div>
+  </nav>
+  </header>
+
+  <div class="halaman-rencana">
+
+    <!-- Jadwal masakan mingguan -->
+    <section class="jadwal" aria-labelledby="judul-jadwal">
+      <h1 id="judul-jadwal" class="bar-judul">PERENCANAAN MASAKAN MINGGUAN</h1>
+
+      <div class="jadwal-isi">
+        <div class="jadwal-kepala">
+          <h2 class="label-jadwal">*Jadwal*</h2>
+          <button type="button" class="tombol-tambah-menu">Tambah Menu</button>
+        </div>
+
+        <ul class="daftar-menu">
+          <li class="kartu-menu"><span>Nasi Goreng</span></li>
+          <li class="kartu-menu"><span>Ikan Bakar</span></li>
+          <li class="kartu-menu"><span>Pecel lele</span></li>
+          <li class="kartu-menu"><span>Ayam Sambal</span></li>
+          <li class="kartu-menu"><span>Bebek gulai</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Daftar belanja -->
+    <section class="belanja" aria-labelledby="judul-belanja">
+      <h2 id="judul-belanja" class="bar-judul bar-judul-kecil">Daftar Belanja Bahan Masakan</h2>
+
+      <form action="#" method="post">
+        <div class="grid-belanja">
+
+          <!-- Sayuran & Buah -->
+          <fieldset class="panel">
+            <legend class="sr-only">Sayuran &amp; Buah</legend>
+            <div class="panel-kepala" aria-hidden="true"><span>Sayuran &amp; Buah</span><span>Harga</span></div>
+            <div class="baris"><input type="text" name="sayuran1" aria-label="Sayuran atau buah 1"><input type="text" name="harga-sayuran1" aria-label="Harga 1" inputmode="numeric"></div>
+            <div class="baris"><input type="text" name="sayuran2" aria-label="Sayuran atau buah 2"><input type="text" name="harga-sayuran2" aria-label="Harga 2" inputmode="numeric"></div>
+            <div class="baris"><input type="text" name="sayuran3" aria-label="Sayuran atau buah 3"><input type="text" name="harga-sayuran3" aria-label="Harga 3" inputmode="numeric"></div>
+            <div class="baris"><input type="text" name="sayuran4" aria-label="Sayuran atau buah 4"><input type="text" name="harga-sayuran4" aria-label="Harga 4" inputmode="numeric"></div>
+            <div class="baris"><input type="text" name="sayuran5" aria-label="Sayuran atau buah 5"><input type="text" name="harga-sayuran5" aria-label="Harga 5" inputmode="numeric"></div>
+            <button type="button" class="tombol-plus" aria-label="Tambah baris sayuran dan buah">+</button>
+          </fieldset>
+
+          <!-- Daging & Ikan -->
+          <fieldset class="panel">
+            <legend class="sr-only">Daging &amp; Ikan</legend>
+            <div class="panel-kepala" aria-hidden="true"><span>Daging &amp; Ikan</span><span>Harga</span></div>
+            <div class="baris"><input type="text" name="daging1" aria-label="Daging atau ikan 1"><input type="text" name="harga-daging1" aria-label="Harga 1" inputmode="numeric"></div>
+            <div class="baris"><input type="text" name="daging2" aria-label="Daging atau ikan 2"><input type="text" name="harga-daging2" aria-label="Harga 2" inputmode="numeric"></div>
+            <button type="button" class="tombol-plus" aria-label="Tambah baris daging dan ikan">+</button>
+          </fieldset>
+
+          <!-- Bumbu & Rempah -->
+          <fieldset class="panel">
+            <legend class="sr-only">Bumbu &amp; Rempah</legend>
+            <div class="panel-kepala" aria-hidden="true"><span>Bumbu &amp; Rempah</span><span>Harga</span></div>
+            <div class="baris"><input type="text" name="bumbu1" aria-label="Bumbu atau rempah 1"><input type="text" name="harga-bumbu1" aria-label="Harga 1" inputmode="numeric"></div>
+            <div class="baris"><input type="text" name="bumbu2" aria-label="Bumbu atau rempah 2"><input type="text" name="harga-bumbu2" aria-label="Harga 2" inputmode="numeric"></div>
+            <div class="baris"><input type="text" name="bumbu3" aria-label="Bumbu atau rempah 3"><input type="text" name="harga-bumbu3" aria-label="Harga 3" inputmode="numeric"></div>
+            <div class="baris"><input type="text" name="bumbu4" aria-label="Bumbu atau rempah 4"><input type="text" name="harga-bumbu4" aria-label="Harga 4" inputmode="numeric"></div>
+            <button type="button" class="tombol-plus" aria-label="Tambah baris bumbu dan rempah">+</button>
+          </fieldset>
+
+          <!-- Total -->
+          <div class="panel panel-total">
+            <div class="panel-kepala"><span>Total</span></div>
+            <output class="nilai-total" name="total">&nbsp;</output>
+          </div>
+
+        </div>
+
+        <div class="aksi">
+          <button type="submit" class="tombol-simpan">Simpan</button>
+        </div>
+      </form>
+    </section>
+
+  </div>
+
+  <footer>&copy; Buku Resep dan Menu Masakan Keluarga</footer>
+
+<script>
+  // ===== Data resep favorit dan rekomendasi =====
+  const RESEP = [
+    {id:1, nama:"Nasi Goreng Spesial", kat:"Hidangan Utama"},
+    {id:2, nama:"Ayam Rendang", kat:"Hidangan Utama"},
+    {id:3, nama:"Risol Kentang", kat:"Cemilan"},
+    {id:4, nama:"Udang Balado", kat:"Cemilan"},
+    {id:5, nama:"Gulai Pakis", kat:"Sayuran"},
+    {id:6, nama:"Pindang Serani Kuah Kuning", kat:"Hidangan Utama"},
+    {id:7, nama:"Bolu Coklat Lumer", kat:"Makanan Penutup"},
+    {id:8, nama:"Asem Bandeng Tradisional", kat:"Hidangan Utama"},
+    {id:9, nama:"Nasi Gudeg", kat:"Hidangan Utama"},
+    {id:10, nama:"Martabak Keju", kat:"Makanan Penutup"}
+  ];
+  const REKOMENDASI = [6,7,8,9,10];
+
+  // ===== Favorit (disimpan di localStorage/database kalau ada) =====
+  let favorit = [1,2,3,4,5];
+  try{
+    const s = localStorage.getItem("favorit");
+    if(s) favorit = JSON.parse(s);
+  }catch(e){}
+  function simpanFavorit(){
+    try{ localStorage.setItem("favorit", JSON.stringify(favorit)); }catch(e){}
+  }
+
+  const $ = id => document.getElementById(id);
+
+  function kartu(r, opsi = {}){
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `<h3>${r.nama}</h3><small>${r.kat}</small>`;
+    if(opsi.heartStatis){
+      div.insertAdjacentHTML("afterbegin", '<span class="heart" aria-label="Favorit">&#10084;</span>');
+    }
+    return div;
+  }
+
+
+  function renderDashboard(){
+    const fg = $("favGrid"); fg.innerHTML = "";
+    const daftar = RESEP.filter(r => favorit.includes(r.id));
+    if(!daftar.length){
+      fg.innerHTML = '<p class="empty">Belum ada resep favorit. Buka menu Kategori lalu tekan ikon hati pada resep.</p>';
+    }
+    daftar.forEach(r => fg.appendChild(kartu(r, {heartStatis:true})));
+
+    const rg = $("recGrid"); rg.innerHTML = "";
+    RESEP.filter(r => REKOMENDASI.includes(r.id)).forEach(r => rg.appendChild(kartu(r)));
+  }
+
+  // Klik logo: scroll otomatis ke atas (kembali ke dashboard)
+  $("logoBtn").addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
+
+  // ===== Menu pengguna (Pengaturan & Logout) =====
+  const userBtn = $("userBtn"), userMenu = $("userMenu");
+  userBtn.addEventListener("click", e => {
+    e.stopPropagation();
+    const buka = userMenu.classList.toggle("show");
+    userBtn.setAttribute("aria-expanded", buka);
+  });
+  document.addEventListener("click", () => {
+    userMenu.classList.remove("show");
+    userBtn.setAttribute("aria-expanded", false);
+  });
+  $("menuSettings").addEventListener("click", e => { e.preventDefault(); alert("Halaman Pengaturan (dalam pengembangan)."); });
+  $("menuLogout").addEventListener("click", e => {
+    e.preventDefault();
+    if(confirm("Yakin ingin logout?")){
+      setTimeout(() => (location.href = "login.html"), 1000);
+      alert("Anda telah logout.");
+    }
+  });
+
+  // ===== Form Hubungi Kami =====
+  $("contactForm").addEventListener("submit", e => {
+    e.preventDefault();
+    $("formMsg").textContent = "Pesan terkirim. Terima kasih, " + $("cNama").value + "!";
+    e.target.reset();
+  });
+
+
+  // Menu yang belum tersedia
+  document.querySelectorAll(".soon").forEach(a => a.addEventListener("click", e => {
+    e.preventDefault();
+    alert("Halaman " + a.dataset.nama + " dalam pengembangan.");
+  }));
+
+  renderDashboard();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL" crossorigin="anonymous"></script>
+
+</body>
+</html>

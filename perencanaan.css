@@ -1,0 +1,283 @@
+/* ===== Variabel warna & dasar ===== */
+:root {
+  --oranye: #d07232;
+  --oranye-gelap: #b85f22;
+  --krem: #f7e7ba;
+  --peach: #f2cfa0;
+  --peach-input: #f0cfa3;
+  --putih: #ffffff;
+  --teks: #111111;
+  --garis: #a8802f;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--teks);
+  background: var(--putih);
+}
+
+ul {
+  list-style: none;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 3px solid var(--teks);
+  outline-offset: 2px;
+}
+
+/* ===== Bingkai halaman ===== */
+.halaman-rencana {
+  min-height: calc(100vh - 8px);
+  padding: 10px 34px 22px;
+  background: #FEE8D6;
+  border: 2px solid var(--garis);
+}
+
+/* ===== Bar judul oranye ===== */
+.bar-judul {
+  padding: 12px 18px;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--teks);
+  background: #E89149;
+}
+
+.bar-judul-kecil {
+  padding: 5px 14px;
+  font-size: 1.2rem;
+  background-color: #E89149;
+}
+
+/* ===== Jadwal ===== */
+.jadwal-isi {
+  padding: 8px 12px 16px;
+  background: var(--peach);
+  border: 2px solid var(--putih);
+  border-top-width: 2px;
+}
+
+.jadwal-kepala {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 0 6px;
+}
+
+.label-jadwal {
+  font-size: 1rem;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.tombol-tambah-menu {
+  padding: 3px 11px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: black;
+  background: #E89149;
+  border: 2px solid var(--putih);
+  cursor: pointer;
+}
+
+.tombol-tambah-menu:hover {
+  background: #FEE8D6;
+}
+
+.daftar-menu {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 25px;
+}
+
+.kartu-menu {
+  display: flex;
+  align-items: flex-end;
+  min-height: 198px;
+  padding: 24px 24px;
+  background: white;
+  border-radius: 34px;
+}
+
+.kartu-menu span {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* ===== Daftar belanja ===== */
+.belanja {
+  margin-top: 14px;
+}
+
+.grid-belanja {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 0.45fr;
+  gap: 16px;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.panel {
+  min-width: 0;
+  min-height: 250px;
+  padding: 10px 14px 12px;
+  background: var(--putih);
+  border: none;
+}
+
+.panel-kepala {
+  display: grid;
+  grid-template-columns: 1fr 108px;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.panel-kepala span:first-child {
+  padding-left: 4px;
+}
+
+.baris {
+  display: grid;
+  grid-template-columns: 1fr 108px;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.baris input {
+  min-width: 0;
+  height: 31px;
+  padding: 0 10px;
+  color: var(--teks);
+  background: var(--peach-input);
+  border: none;
+  border-radius: 4px;
+}
+
+.baris input:focus-visible {
+  outline-offset: 0;
+}
+
+.tombol-plus {
+  display: block;
+  margin-top: 4px;
+  padding: 0 4px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--teks);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.tombol-plus:hover {
+  color: var(--oranye);
+}
+
+/* Panel total */
+.panel-total .panel-kepala {
+  display: block;
+  padding-left: 0;
+}
+
+.nilai-total {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* ===== Tombol simpan ===== */
+.aksi {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.tombol-simpan {
+  width: 164px;
+  padding: 8px 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--teks);
+  background: var(--oranye);
+  border: none;
+  cursor: pointer;
+}
+
+.tombol-simpan:hover {
+  background: var(--oranye-gelap);
+}
+  footer{
+    background:#E89149;
+    color:#fff;
+    text-align:center;
+    padding:20px;
+    font-size:13px
+  }
+
+/* ===== Responsif ===== */
+@media (max-width: 1100px) {
+  .daftar-menu {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .grid-belanja {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .halaman-rencana {
+    padding: 10px 14px 20px;
+  }
+
+  .bar-judul {
+    font-size: 1.15rem;
+  }
+
+  .daftar-menu {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .kartu-menu {
+    min-height: 140px;
+    padding: 16px;
+    border-radius: 24px;
+  }
+
+  .grid-belanja {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    min-height: 0;
+  }
+
+  .tombol-simpan {
+    width: 100%;
+  }
+}

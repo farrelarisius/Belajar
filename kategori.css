@@ -1,0 +1,240 @@
+/* ===== Variabel warna & dasar ===== */
+:root {
+  --oranye-tombol-gelap: #d07232;
+  --oranye-tombol: #e5832f;
+  --krem: #f7e7ba;
+  --putih: #ffffff;
+  --teks: #111111;
+  --garis: #a8802f;
+  --radius: 14px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--teks);
+  background: #ffffff;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 3px solid var(--teks);
+  outline-offset: 2px;
+}
+
+/* ===== Bingkai halaman ===== */
+.halaman {
+  min-height: calc(100vh - 8px);
+  background: #FEE8D6;
+  border: 2px solid var(--garis);
+}
+
+/* ===== Konten ===== */
+.konten {
+  padding: 28px 34px 56px;
+}
+
+h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+/* ===== Kategori resep ===== */
+.kepala-kategori {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.subjudul {
+  margin-top: 6px;
+  font-size: 1.1rem;
+}
+
+.tombol-semua {
+  padding: 8px 17px;
+  margin-top: 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  background: var(--putih);
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.tombol-semua:hover {
+  background: #fff6dc;
+}
+
+.grid-kategori {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 18px 18px;
+}
+
+.kartu {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  height: 92px;
+  padding: 0 22px;
+  background: var(--putih);
+  border-radius: var(--radius);
+  transition: box-shadow 0.15s ease;
+}
+
+.kartu:hover {
+  box-shadow: 0 0 0 2px var(--oranye-tombol-gelap);
+}
+
+.kartu-nama {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.kartu-jumlah {
+  font-size: 0.95rem;
+}
+
+/* ===== Pencarian resep ===== */
+.bagian-pencarian {
+  margin-top: 44px;
+}
+
+.form-cari {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 57%;
+  margin-top: 14px;
+  padding: 0 16px 0 12px;
+  height: 58px;
+  background: var(--putih);
+  border-radius: 10px;
+}
+
+.form-cari input {
+  flex: 1;
+  color: black;
+  min-width: 0;
+  font-family: arial, sans-serif;
+  height: 100%;
+  font-size: 1rem;
+  border: none;
+  background: transparent;
+}
+
+.form-cari input:focus-visible {
+  outline: none;
+}
+
+.form-cari:focus-within {
+  box-shadow: 0 0 0 3px var(--oranye-tombol);
+}
+
+.form-cari button {
+  padding: 8px 22px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--putih);
+  background: var(--oranye-tombol);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.form-cari button:hover {
+  background: var(--oranye-tombol-gelap);
+}
+
+.judul-riwayat {
+  margin-top: 28px;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.riwayat {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.riwayat a {
+  display: block;
+  padding: 10px 28px;
+  font-size: 0.9rem;
+  background: var(--putih);
+  border-radius: 4px;
+}
+
+.riwayat a:hover {
+  background: #fff6dc;
+}
+  footer{
+    background:#E89149;
+    color:#fff;
+    text-align:center;
+    padding:20px;
+    font-size:13px
+  }
+
+/* ===== Responsif ===== */
+@media (max-width: 1100px) {
+  .grid-kategori {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .form-cari {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 720px) {
+  .konten {
+    padding: 22px 16px 40px;
+  }
+
+  .kepala-kategori {
+    flex-direction: column;
+  }
+
+  .tombol-semua {
+    margin-top: 0;
+  }
+
+  .grid-kategori {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .kartu {
+    padding: 0 16px;
+  }
+}
