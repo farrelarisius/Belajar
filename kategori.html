@@ -244,13 +244,52 @@
   }
 
 
-  /* FOOTER */
-  footer{
+  /* TENTANG KAMI / FOOTER */
+  .about{
     background:#E89149;
-    color:#fff;
+    padding:28px 0 20px;
+    color:white;
+  }
+  .about .row{
+    justify-content:center;
     text-align:center;
-    padding:20px;
-    font-size:13px
+  }
+  .about h4{
+    font-size:18px;
+    font-weight:700;
+    margin:0 0 12px;
+  }
+  .about p{
+    font-size:14px;
+    line-height:1.5;
+    margin:0;
+    padding:0 6px;
+    text-align:center;
+  }
+  .about p img{
+    display:block;
+    margin:0 auto;
+  }
+  .about ul{
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+  .about li{
+    display:inline-flex;
+    margin:16px;
+  }
+  .about a{
+    color:white;
+    text-decoration:none;
+  }
+  .about a:hover{
+    color:red;
+  }
+  .copy{
+    text-align:center;
+    font-size:13px;
+    margin-top:24px;
   }
 
   @media(max-width:900px){
@@ -376,7 +415,28 @@
     </main>
   </div>
 
-  <footer>&copy; Buku Resep dan Menu Masakan Keluarga</footer>
+  <footer class="about">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4">
+        <h4>TENTANG KAMI</h4>
+        <p>Mahasiswa Politeknik Negeri Batam, Jurusan Teknik Informatika</p>
+      </div>
+      <div class="col-md-4">
+        <h4>MITRA KERJA SAMA</h4>
+        <p><img src="Polibatam Univ Logo baru .png" width="100" height="100" alt="Logo Polibatam"></p>
+      </div>
+      <div class="col-md-4">
+        <h4>HUBUNGI KAMI</h4>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Instagram</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="copy">&copy; Buku Resep dan Menu Masakan Keluarga</div>
+  </div>
+</footer>
 
 <script>
   // ===== Data resep favorit dan rekomendasi =====
