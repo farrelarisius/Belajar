@@ -91,6 +91,6 @@ if (formLogin) {
     if (!user) return notif("Username atau password salah.", "gagal");
 
     notif(`Selamat datang, ${user.nama}!`, "sukses");
-    setTimeout(() => (location.href = "Dashboard.html"), 1000);
+    setTimeout(() => (location.href = "index.html"), 1000);
   });
 }

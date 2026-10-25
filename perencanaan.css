@@ -230,13 +230,6 @@ input {
 .tombol-simpan:hover {
   background: var(--oranye-gelap);
 }
-  footer{
-    background:#E89149;
-    color:#fff;
-    text-align:center;
-    padding:20px;
-    font-size:13px
-  }
 
 /* ===== Responsif ===== */
 @media (max-width: 1100px) {
