@@ -465,6 +465,12 @@
   .r-bahan ul{
     margin-left:18px
   }
+  .r-langkah{
+    margin-top:10px
+  }
+  .r-langkah ol{
+    margin-left:18px
+  }
   .r-catatan{
     margin-top:10px
   }
@@ -544,7 +550,7 @@
               <select class="field" id="kesulitan"><option>Mudah</option><option>Sedang</option><option>Sulit</option></select></div>
             <div>
               <label for="kategori">Kategori</label>
-              <select class="field" id="kategori"><option>Sarapan</option><option>Hidangan Utama</option><option>Cemilan</option></select>
+              <select class="field" id="kategori"><option>Sarapan</option><option>Hidangan Utama</option><option>Cemilan</option><option>Sayuran</option><option>Makanan Penutup</option></select>
             </div>
           </div>
 
@@ -556,6 +562,9 @@
           <label>Bahan - bahan</label>
           <div id="grupList"></div>
           <div class="right"><button type="button" class="mini" id="addGrup">Tambahkan Grub</button></div>
+
+          <label for="langkah">Langkah Memasak (satu langkah per baris)</label>
+          <textarea class="field" id="langkah" rows="6"></textarea>
         </div>
         <div class="save-row"><button type="submit" class="save">Simpan</button></div>
       </form>
@@ -596,6 +605,36 @@
       alert("Anda telah logout.");
     }
   });
+
+  // ===== Penyimpanan localStorage (dibaca juga oleh index.html) =====
+  const KUNCI_RESEP   = "resepSaya";
+  const KUNCI_FAVORIT = "favorit";
+
+  function bacaResep(){
+    try{
+      const d = JSON.parse(localStorage.getItem(KUNCI_RESEP));
+      return Array.isArray(d) ? d : [];
+    }catch(e){ return []; }
+  }
+  function simpanResep(){
+    try{
+      localStorage.setItem(KUNCI_RESEP, JSON.stringify(daftarResep));
+      return true;
+    }catch(e){
+      alert("Gagal menyimpan. Penyimpanan browser penuh, coba pakai foto yang lebih kecil.");
+      return false;
+    }
+  }
+  function bacaFavorit(){
+    try{
+      const d = JSON.parse(localStorage.getItem(KUNCI_FAVORIT));
+      if(Array.isArray(d)) return d;
+    }catch(e){}
+    return [1,2,3,4,5];   // sama dengan daftar favorit awal di index.html
+  }
+  function simpanFavorit(arr){
+    try{ localStorage.setItem(KUNCI_FAVORIT, JSON.stringify(arr)); }catch(e){}
+  }
 
   // ===== Pencatatan resep =====
 
@@ -651,24 +690,39 @@
   $("addGrup").onclick = tambahGrup;
   tambahGrup();
 
-  // Foto resep (URL disimpan agar bisa ditampilkan di daftar)
-  let fotoUrl = "";
+  // Foto resep: diperkecil (maks. lebar 600px) lalu disimpan sebagai data URL
+  // supaya tetap ada setelah halaman di-refresh dan muat di localStorage
+  let fotoData = "";
   const fotoAwal = $("fotoBox").innerHTML;
 
   $("fotoInput").addEventListener("change", e => {
     const f = e.target.files[0];
     if(!f) return;
-    fotoUrl = URL.createObjectURL(f);
-    const img = document.createElement("img");
-    img.alt = "Foto resep";
-    img.src = fotoUrl;
-    $("fotoBox").replaceChildren(img);
-    $("plusBadge").classList.add("show");
+    const reader = new FileReader();
+    reader.onload = () => {
+      const im = new Image();
+      im.onload = () => {
+        const skala = Math.min(1, 600 / im.width);
+        const c = document.createElement("canvas");
+        c.width  = Math.round(im.width * skala);
+        c.height = Math.round(im.height * skala);
+        c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+        fotoData = c.toDataURL("image/jpeg", 0.7);
+
+        const img = document.createElement("img");
+        img.alt = "Foto resep";
+        img.src = fotoData;
+        $("fotoBox").replaceChildren(img);
+        $("plusBadge").classList.add("show");
+      };
+      im.src = reader.result;
+    };
+    reader.readAsDataURL(f);
   });
   $("fotoBox").addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); $("fotoInput").click(); } });
 
-  // ===== Daftar resep tersimpan =====
-  const daftarResep = [];
+  // ===== Daftar resep tersimpan (dimuat dari localStorage) =====
+  const daftarResep = bacaResep();   // resep terbaru di urutan pertama
 
   // Hindari karakter HTML berbahaya dari input pengguna
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({
@@ -681,11 +735,11 @@
     $("resepList").innerHTML = daftarResep.map((r, i) => `
       <details class="resep-item">
         <summary>
-          <span>${esc(r.judul)}</span>
-          <span class="badge-kat">${esc(r.kategori)}</span>
+          <span>${esc(r.nama)}</span>
+          <span class="badge-kat">${esc(r.kat)}</span>
         </summary>
         <div class="resep-detail">
-          ${r.foto ? `<img class="r-foto" src="${r.foto}" alt="Foto ${esc(r.judul)}">` : "<div></div>"}
+          ${r.gambar ? `<img class="r-foto" src="${esc(r.gambar)}" alt="Foto ${esc(r.nama)}">` : "<div></div>"}
           <div>
             <div class="r-info">
               <div><b>Waktu Persiapan</b>${esc(r.persiapan) || "-"}</div>
@@ -696,7 +750,7 @@
 
             <div class="r-bahan">
               <b class="r-label">Bahan-bahan</b>
-              ${r.bahan.map((g, n) => `
+              ${(r.bahanGrup || []).map((g, n) => `
                 <h4>${esc(g.grup) || "Grub " + (n + 1)}</h4>
                 <ul>
                   ${g.items.filter(b => b.nama).map(b => `
@@ -705,6 +759,12 @@
                 </ul>
               `).join("")}
             </div>
+
+            ${(r.langkah && r.langkah.length) ? `
+              <div class="r-langkah">
+                <b class="r-label">Langkah Memasak</b>
+                <ol>${r.langkah.map(l => `<li>${esc(l)}</li>`).join("")}</ol>
+              </div>` : ""}
 
             ${r.catatan ? `<div class="r-catatan"><b class="r-label">Catatan</b>${esc(r.catatan)}</div>` : ""}
 
@@ -720,7 +780,10 @@
     const btn = e.target.closest(".btn-hapus-resep");
     if(!btn) return;
     if(confirm("Hapus resep ini?")){
-      daftarResep.splice(Number(btn.dataset.index), 1);
+      const [dihapus] = daftarResep.splice(Number(btn.dataset.index), 1);
+      simpanResep();
+      // hapus juga dari daftar favorit
+      simpanFavorit(bacaFavorit().filter(id => id !== dihapus.id));
       tampilkanResep();
     }
   });
@@ -732,14 +795,16 @@
     tambahGrup();
     $("fotoBox").innerHTML = fotoAwal;
     $("plusBadge").classList.remove("show");
-    fotoUrl = "";
+    fotoData = "";
   }
+
+  const perBaris = t => t.split("\n").map(x => x.trim()).filter(Boolean);
 
   $("noteForm").addEventListener("submit", e => {
     e.preventDefault();
 
     // Kumpulkan data bahan: grub -> nama, jumlah, satuan
-    const bahan = [...document.querySelectorAll(".grup")].map(g => ({
+    const bahanGrup = [...document.querySelectorAll(".grup")].map(g => ({
       grup: g.querySelector(".nama-grup").value,
       items: [...g.querySelectorAll(".bahan-row")].map(r => ({
         nama:   r.querySelector(".b-nama").value,
@@ -748,23 +813,53 @@
       }))
     }));
 
+    // Versi teks datar, dipakai index.html untuk pop up detail resep
+    const bahanTeks = bahanGrup.flatMap(g =>
+      g.items.filter(b => b.nama.trim()).map(b =>
+        b.nama.trim() + " - " + [b.jumlah, b.satuan].filter(Boolean).join(" ")
+      )
+    );
+
+    const persiapan = $("persiapan").value.trim();
+    const memasak   = $("memasak").value.trim();
+    const waktu = [
+      persiapan && "Persiapan " + persiapan,
+      memasak   && "Memasak " + memasak
+    ].filter(Boolean).join(", ") || "-";
+
     const resep = {
-      judul:     $("judul").value,
-      foto:      fotoUrl,
-      persiapan: $("persiapan").value,
-      memasak:   $("memasak").value,
-      porsi:     $("porsi").value,
-      kesulitan: $("kesulitan").value,
-      kategori:  $("kategori").value,
-      catatan:   $("catatan").value,
-      bahan
+      // --- field yang dibaca index.html ---
+      id:          Date.now(),
+      nama:        $("judul").value.trim(),
+      kat:         $("kategori").value,
+      waktu:       waktu,
+      porsi:       $("porsi").value.trim() || "-",
+      gambar:      fotoData,
+      bahan:       bahanTeks,
+      langkah:     perBaris($("langkah").value),
+      rekomendasi: false,   // resep dari Pencatatan tidak masuk Rekomendasi
+      milikUser:   true,
+      // --- field tambahan khusus halaman ini ---
+      persiapan:   persiapan,
+      memasak:     memasak,
+      kesulitan:   $("kesulitan").value,
+      catatan:     $("catatan").value,
+      bahanGrup:   bahanGrup
     };
 
-    // TODO: ganti dengan pengiriman data ke backend proyek kita
-    daftarResep.unshift(resep);   // resep terbaru tampil paling atas
+    daftarResep.unshift(resep);       // resep terbaru tampil paling atas
+    if(!simpanResep()){               // gagal simpan: batalkan
+      daftarResep.shift();
+      return;
+    }
+    // Otomatis masuk Favorit di dashboard
+    const fav = bacaFavorit();
+    fav.push(resep.id);
+    simpanFavorit(fav);
+
     tampilkanResep();
     resetForm();
-    alert("Resep \"" + resep.judul + "\" tersimpan.");
+    alert("Resep \"" + resep.nama + "\" tersimpan.");
   });
 
   tampilkanResep();
