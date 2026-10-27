@@ -26,7 +26,6 @@
     color:#000
   }
 
-
   /* NAVBAR */
   .navbar{
     position:sticky;
@@ -154,7 +153,6 @@
     font-size:13px;
     margin-top:24px;
   }
-
 
   /* PENCATATAN */
   .note-wrap{
@@ -431,7 +429,6 @@
     margin: 15px;
   }
 
-
   /* DAFTAR RESEP */
   .daftar-wrap{
     margin:30px 20px 0
@@ -445,7 +442,6 @@
     font-size:13px;
     color:#7a5a3a
   }
-  /* reset margin span global khusus di daftar resep */
   .daftar-wrap span{
     margin-bottom:0
   }
@@ -706,7 +702,7 @@
       localStorage.setItem(KUNCI_RESEP, JSON.stringify(daftarResep));
       return true;
     }catch(e){
-      console.warn("Lokalstorage penuh, foto tidak dapat disimpan secara lokal.", e);
+      console.warn("LocalStorage penuh, foto mungkin terlalu besar untuk disimpan secara lokal.", e);
       return false;
     }
   }
@@ -805,7 +801,7 @@
   });
   $("fotoBox").addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); $("fotoInput").click(); } });
 
-  // ===== Hanya memuat resep buatan pengguna sendiri (dari localStorage) =====
+  // ===== Resep Pengguna (Daftar Lokal) =====
   let daftarResep = bacaResepLokal();
 
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({
@@ -858,7 +854,7 @@
     `).join("");
   }
 
-  // Hapus Resep lokal (dan dari Supabase jika ada ID nya)
+  // Hapus Resep dari Lokal (dan dari Supabase jika dikirim ke sana)
   $("resepList").addEventListener("click", async e => {
     const btn = e.target.closest(".btn-hapus-resep");
     if(!btn) return;
@@ -867,7 +863,6 @@
     const resepDihapus = daftarResep[index];
 
     if(confirm("Hapus resep ini?")){
-      // Hapus dari Supabase jika resep tersebut punya ID database
       if(resepDihapus && resepDihapus.dbId) {
         try {
           await supabaseClient.from('resep').delete().eq('id', resepDihapus.dbId);
@@ -894,7 +889,7 @@
 
   const perBaris = t => t.split("\n").map(x => x.trim()).filter(Boolean);
 
-  // ===== Simpan Resep (Disimpan Lokal & Dikirim ke Supabase) =====
+  // ===== Simpan Resep =====
   $("noteForm").addEventListener("submit", async e => {
     e.preventDefault();
     const btnSimpan = $("btnSimpan");
@@ -924,6 +919,7 @@
     ].filter(Boolean).join(", ") || "-";
 
     const localId = Date.now();
+    const isRekomendasi = $("fRek").checked; // Pengecekan status centang Rekomendasi
 
     const resepBaru = {
       id:          localId,
@@ -934,7 +930,7 @@
       gambar:      fotoData,
       bahan:       bahanTeks,
       langkah:     perBaris($("langkah").value),
-      rekomendasi: $("fRek").checked,
+      rekomendasi: isRekomendasi,
       milikUser:   true,
       persiapan:   persiapan,
       memasak:     memasak,
@@ -943,29 +939,31 @@
       bahanGrup:   bahanGrup
     };
 
-    // 1. Kirim data resep ke Supabase
-    try {
-      const { data, error } = await supabaseClient
-        .from('resep')
-        .insert([{
-          nama:        resepBaru.nama,
-          kat:         resepBaru.kat,
-          waktu:       resepBaru.waktu,
-          porsi:       resepBaru.porsi,
-          gambar:      resepBaru.gambar,
-          bahan:       resepBaru.bahan,
-          langkah:     resepBaru.langkah
-        }])
-        .select();
+    // KIRIM KE SUPABASE HANYA JIKA DIBERIKAN CENTANG "Tampilkan Resep di Rekomendasi"
+    if(isRekomendasi) {
+      try {
+        const { data, error } = await supabaseClient
+          .from('resep')
+          .insert([{
+            nama:        resepBaru.nama,
+            kat:         resepBaru.kat,
+            waktu:       resepBaru.waktu,
+            porsi:       resepBaru.porsi,
+            gambar:      resepBaru.gambar,
+            bahan:       resepBaru.bahan,
+            langkah:     resepBaru.langkah
+          }])
+          .select();
 
-      if (!error && data && data.length > 0) {
-        resepBaru.dbId = data[0].id; // simpan ID database
+        if (!error && data && data.length > 0) {
+          resepBaru.dbId = data[0].id; // simpan ID database di objek lokal
+        }
+      } catch(err) {
+        console.warn("Gagal mengirim resep ke Supabase:", err);
       }
-    } catch(err) {
-      console.warn("Gagal mengirim resep ke Supabase:", err);
     }
 
-    // 2. Simpan ke daftar resep lokal pengguna
+    // Tetap simpan ke daftar lokal pengguna
     daftarResep.unshift(resepBaru);
     simpanResepLokal();
 
@@ -982,7 +980,6 @@
     alert("Resep \"" + resepBaru.nama + "\" berhasil disimpan.");
   });
 
-  // Tampilkan data resep lokal pengguna saat pertama dibuka
   tampilkanResep();
 </script>
 
