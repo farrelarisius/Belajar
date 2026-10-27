@@ -7,6 +7,9 @@
 <title>Dashboard</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" >
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
+
+<!-- Supabase JS Client CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="kategori.css">
 <style>
 
@@ -331,6 +334,12 @@
   .tombol-semua:hover {
     background-color: #E89149;
   }
+  .pesan-kosong {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #888;
+    padding: 20px 0;
+  }
 </style>
 </head>
 
@@ -377,20 +386,12 @@
             <h2 id="judul-kategori">KATEGORI RESEP</h2>
             <p class="subjudul">Jelajahi Resep Terbaik Untuk Hari Ini</p>
           </div>
-          <a href="#" class="tombol-semua">Semua Kategori</a>
+          <a href="#" class="tombol-semua" id="btnSemuaKategori">Semua Kategori</a>
         </div>
 
-        <ul class="grid-kategori">
-          <li><a href="#" class="kartu"><span class="kartu-nama">Hidangan Utama</span><span class="kartu-jumlah">10 Resep</span></a></li>
-          <li><a href="#" class="kartu"><span class="kartu-nama">Ayam</span><span class="kartu-jumlah">15 Resep</span></a></li>
-          <li><a href="#" class="kartu"><span class="kartu-nama">Nasi</span><span class="kartu-jumlah">21 Resep</span></a></li>
-          <li><a href="#" class="kartu"><span class="kartu-nama">Seafood</span><span class="kartu-jumlah">21 Resep</span></a></li>
-          <li><a href="#" class="kartu"><span class="kartu-nama">Sayuran</span><span class="kartu-jumlah">15 Resep</span></a></li>
-          <li><a href="#" class="kartu"><span class="kartu-nama">Mie</span><span class="kartu-jumlah">15 Resep</span></a></li>
-          <li><a href="#" class="kartu"><span class="kartu-nama">Cemilan</span><span class="kartu-jumlah">10 Resep</span></a></li>
-          <li><a href="#" class="kartu"><span class="kartu-nama">Makanan Penutup</span><span class="kartu-jumlah">15 Resep</span></a></li>
-          <li><a href="#" class="kartu"><span class="kartu-nama">Sup</span><span class="kartu-jumlah">21 Resep</span></a></li>
-          <li><a href="#" class="kartu"><span class="kartu-nama">Ikan</span><span class="kartu-jumlah">21 Resep</span></a></li>
+        <ul class="grid-kategori" id="gridKategori">
+          <!-- Data kategori dari Supabase akan di-render di sini -->
+          <li class="pesan-kosong">Memuat data kategori...</li>
         </ul>
       </section>
 
@@ -398,14 +399,14 @@
       <section class="bagian-pencarian" aria-labelledby="judul-pencarian">
         <h2 id="judul-pencarian">CARI KATEGORI</h2>
 
-        <form class="form-cari" role="search" action="#" method="get">
+        <form class="form-cari" id="formCari" role="search" action="#" method="get">
           <label for="kolom-cari" class="sr-only">Cari resep</label>
-          <input type="search" id="kolom-cari" name="q" autocomplete="off">
+          <input type="search" id="kolom-cari" name="q" placeholder="Ketik nama kategori..." autocomplete="off">
           <button type="submit">Cari</button>
         </form>
 
         <h3 class="judul-riwayat">Pencarian sebelumnya</h3>
-        <ul class="riwayat">
+        <ul class="riwayat" id="daftarRiwayat">
           <li><a href="#">Ayam</a></li>
           <li><a href="#">Cemilan</a></li>
           <li><a href="#">Cepat Saji</a></li>
@@ -439,94 +440,185 @@
 </footer>
 
 <script>
-  // ===== Data resep favorit dan rekomendasi =====
-  const RESEP = [
-    {id:1, nama:"Nasi Goreng Spesial", kat:"Hidangan Utama"},
-    {id:2, nama:"Ayam Rendang", kat:"Hidangan Utama"},
-    {id:3, nama:"Risol Kentang", kat:"Cemilan"},
-    {id:4, nama:"Udang Balado", kat:"Cemilan"},
-    {id:5, nama:"Gulai Pakis", kat:"Sayuran"},
-    {id:6, nama:"Pindang Serani Kuah Kuning", kat:"Hidangan Utama"},
-    {id:7, nama:"Bolu Coklat Lumer", kat:"Makanan Penutup"},
-    {id:8, nama:"Asem Bandeng Tradisional", kat:"Hidangan Utama"},
-    {id:9, nama:"Nasi Gudeg", kat:"Hidangan Utama"},
-    {id:10, nama:"Martabak Keju", kat:"Makanan Penutup"}
-  ];
-  const REKOMENDASI = [6,7,8,9,10];
+  // ===== 1. INISIALISASI SUPABASE KREDENSIAL =====
+  const SUPABASE_URL = "https://vdvlymemoqkgdpzgndhr.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_-xh3JEbtYgQ5ERgIf3VWGg_L5ETk7_d";
 
-  // ===== Favorit (disimpan di localStorage/database kalau ada) =====
-  let favorit = [1,2,3,4,5];
-  try{
-    const s = localStorage.getItem("favorit");
-    if(s) favorit = JSON.parse(s);
-  }catch(e){}
-  function simpanFavorit(){
-    try{ localStorage.setItem("favorit", JSON.stringify(favorit)); }catch(e){}
-  }
+  // Perbaikan: Gunakan destructuring dari window.supabase agar variabel tidak bentrok
+  const { createClient } = window.supabase;
+  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const $ = id => document.getElementById(id);
 
-  function kartu(r, opsi = {}){
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `<h3>${r.nama}</h3><small>${r.kat}</small>`;
-    if(opsi.heartStatis){
-      div.insertAdjacentHTML("afterbegin", '<span class="heart" aria-label="Favorit">&#10084;</span>');
-    }
-    return div;
-  }
+  // Element DOM
+  const kolomCari = $("kolom-cari");
+  const formCari = $("formCari");
+  const gridKategori = $("gridKategori");
+  const daftarRiwayat = $("daftarRiwayat");
+  const btnSemuaKategori = $("btnSemuaKategori");
 
-
-  function renderDashboard(){
-    const fg = $("favGrid"); fg.innerHTML = "";
-    const daftar = RESEP.filter(r => favorit.includes(r.id));
-    if(!daftar.length){
-      fg.innerHTML = '<p class="empty">Belum ada resep favorit. Buka menu Kategori lalu tekan ikon hati pada resep.</p>';
-    }
-    daftar.forEach(r => fg.appendChild(kartu(r, {heartStatis:true})));
-
-    const rg = $("recGrid"); rg.innerHTML = "";
-    RESEP.filter(r => REKOMENDASI.includes(r.id)).forEach(r => rg.appendChild(kartu(r)));
-  }
-
-  // Klik logo: scroll otomatis ke atas (kembali ke dashboard)
+  // ===== NAVIGASI LOGO & USER MENU =====
   $("logoBtn").addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
 
-  // ===== Menu pengguna (Pengaturan & Logout) =====
   const userBtn = $("userBtn"), userMenu = $("userMenu");
-  userBtn.addEventListener("click", e => {
-    e.stopPropagation();
-    const buka = userMenu.classList.toggle("show");
-    userBtn.setAttribute("aria-expanded", buka);
+  if(userBtn && userMenu) {
+    userBtn.addEventListener("click", e => {
+      e.stopPropagation();
+      const buka = userMenu.classList.toggle("show");
+      userBtn.setAttribute("aria-expanded", buka);
+    });
+    document.addEventListener("click", () => {
+      userMenu.classList.remove("show");
+      userBtn.setAttribute("aria-expanded", false);
+    });
+  }
+
+  if($("menuSettings")) {
+    $("menuSettings").addEventListener("click", e => { e.preventDefault(); alert("Halaman Pengaturan (dalam pengembangan)."); });
+  }
+  if($("menuLogout")) {
+    $("menuLogout").addEventListener("click", e => {
+      e.preventDefault();
+      if(confirm("Yakin ingin logout?")){
+        setTimeout(() => (location.href = "login.html"), 1000);
+        alert("Anda telah logout.");
+      }
+    });
+  }
+
+  // ===== AMBIL DATA KATEGORI DARI SUPABASE =====
+  async function loadKategoriFromSupabase() {
+    try {
+      // Coba ambil kategori + hitung resep
+      let { data, error } = await supabaseClient
+        .from('kategori')
+        .select(`
+          id,
+          nama,
+          resep ( count )
+        `);
+
+      // Fallback: Jika tabel 'resep' belum ada/terhubung, ambil data kategori saja
+      if (error) {
+        console.warn("Mencoba query sederhana (tanpa join resep)...");
+        const fallbackRes = await supabaseClient
+          .from('kategori')
+          .select('id, nama');
+        
+        if (fallbackRes.error) throw fallbackRes.error;
+        data = fallbackRes.data;
+      }
+
+      renderKategoriGrid(data);
+    } catch (err) {
+      console.error("Gagal mengambil data dari Supabase:", err);
+      gridKategori.innerHTML = `<li class="pesan-kosong">Gagal memuat data kategori.<br><small>${err.message || ''}</small></li>`;
+    }
+  }
+
+  // Render HTML Grid berdasarkan Data Supabase
+  function renderKategoriGrid(kategoriList) {
+    gridKategori.innerHTML = "";
+
+    if (!kategoriList || kategoriList.length === 0) {
+      gridKategori.innerHTML = '<li class="pesan-kosong">Belum ada data kategori di database.</li>';
+      return;
+    }
+
+    kategoriList.forEach(item => {
+      const jumlahResep = (item.resep && item.resep[0]) ? item.resep[0].count : 0;
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <a href="#" class="kartu">
+          <span class="kartu-nama">${item.nama}</span>
+          <span class="kartu-jumlah">${jumlahResep} Resep</span>
+        </a>
+      `;
+      gridKategori.appendChild(li);
+    });
+  }
+
+  // ===== FITUR PENCARIAN & RIWAYAT =====
+  function filterKategori(keyword) {
+    const query = keyword.toLowerCase().trim();
+    const itemKategori = gridKategori.querySelectorAll("li:not(.pesan-kosong)");
+    let ketemu = false;
+
+    itemKategori.forEach(li => {
+      const namaEl = li.querySelector(".kartu-nama");
+      if (namaEl) {
+        const namaKategori = namaEl.textContent.toLowerCase();
+        if (namaKategori.includes(query)) {
+          li.style.display = "";
+          ketemu = true;
+        } else {
+          li.style.display = "none";
+        }
+      }
+    });
+
+    let pesanKosong = $("pesanKosong");
+    if (!ketemu) {
+      if (!pesanKosong) {
+        pesanKosong = document.createElement("li");
+        pesanKosong.id = "pesanKosong";
+        pesanKosong.className = "pesan-kosong";
+        pesanKosong.textContent = "Kategori tidak ditemukan.";
+        gridKategori.appendChild(pesanKosong);
+      }
+    } else if (pesanKosong) {
+      pesanKosong.remove();
+    }
+  }
+
+  function tambahRiwayat(keyword) {
+    const kata = keyword.trim();
+    if (!kata) return;
+
+    const items = daftarRiwayat.querySelectorAll("a");
+    for (let a of items) {
+      if (a.textContent.toLowerCase() === kata.toLowerCase()) return;
+    }
+
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = "#";
+    a.textContent = kata;
+    li.appendChild(a);
+    daftarRiwayat.prepend(li);
+  }
+
+  // Event Listeners Pencarian
+  kolomCari.addEventListener("input", e => {
+    filterKategori(e.target.value);
   });
-  document.addEventListener("click", () => {
-    userMenu.classList.remove("show");
-    userBtn.setAttribute("aria-expanded", false);
-  });
-  $("menuSettings").addEventListener("click", e => { e.preventDefault(); alert("Halaman Pengaturan (dalam pengembangan)."); });
-  $("menuLogout").addEventListener("click", e => {
+
+  formCari.addEventListener("submit", e => {
     e.preventDefault();
-    if(confirm("Yakin ingin logout?")){
-      setTimeout(() => (location.href = "login.html"), 1000);
-      alert("Anda telah logout.");
+    const val = kolomCari.value;
+    filterKategori(val);
+    tambahRiwayat(val);
+  });
+
+  daftarRiwayat.addEventListener("click", e => {
+    if (e.target.tagName === "A") {
+      e.preventDefault();
+      const kata = e.target.textContent;
+      kolomCari.value = kata;
+      filterKategori(kata);
     }
   });
 
-  // ===== Form Hubungi Kami =====
-  $("contactForm").addEventListener("submit", e => {
-    e.preventDefault();
-    $("formMsg").textContent = "Pesan terkirim. Terima kasih, " + $("cNama").value + "!";
-    e.target.reset();
-  });
+  if(btnSemuaKategori) {
+    btnSemuaKategori.addEventListener("click", e => {
+      e.preventDefault();
+      kolomCari.value = "";
+      filterKategori("");
+    });
+  }
 
-
-  // Menu yang belum tersedia
-  document.querySelectorAll(".soon").forEach(a => a.addEventListener("click", e => {
-    e.preventDefault();
-    alert("Halaman " + a.dataset.nama + " dalam pengembangan.");
-  }));
-
-  renderDashboard();
+  // Jalankan pemanggilan data saat halaman dimuat
+  loadKategoriFromSupabase();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
