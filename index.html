@@ -7,13 +7,13 @@
 <title>Dashboard</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" >
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
+<!-- Supabase SDK JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#000}
-
 
   /* NAVBAR */
   .navbar{
@@ -178,7 +178,6 @@
     padding:10px 0
   }
 
-
   /* TENTANG KAMI / FOOTER */
   .about{
     background:#E89149;
@@ -261,7 +260,6 @@
     margin: 15px;
   }
 
-
   /* KARTU BISA DIKLIK */
   .card{cursor:pointer;transition:transform .15s, box-shadow .15s}
   .card:hover,.card:focus-visible{
@@ -318,7 +316,6 @@
   .resep-body h4{font-size:15px;margin:14px 0 6px;color:#E89149}
   .resep-body ul,.resep-body ol{padding-left:20px}
 
-  /* Gambar di kartu */
   .card{overflow:hidden;padding:0;justify-content:flex-start}
   .card-img{
     width:100%;
@@ -329,7 +326,6 @@
   }
   .card-teks{padding:10px 14px}
 
-  /* Gambar di pop up */
   .resep-img{
     width:100%;
     max-height:220px;
@@ -432,25 +428,30 @@
 </footer>
 
 <script>
-  // ===== Variabel Rekomendasi =====
   const MAKS_REKOMENDASI = 0;
-  let REKOMENDASI = [6, 7, 8, 9, 10, 11, 12, 13, 14];
+  let REKOMENDASI_IDS = [1, 2, 3, 4, 5]; // ID awal resep bawaan
 
-  // ===== Konfigurasi Supabase Client =====
+  // ===== KLIEN SUPABASE =====
   const SUPABASE_URL = 'https://vdvlymemoqkgdpzgndhr.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_-xh3JEbtYgQ5ERgIf3VWGg_L5ETk7_d';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
 
   async function muatData() {
     try {
-      const { data, error } = await supabaseClient.from('resep').select('*'); 
+      // Ambil seluruh resep dari database Supabase
+      const { data, error } = await supabaseClient
+        .from('resep')
+        .select('*')
+        .order('id', { ascending: false });
+
       if (error) {
         console.error("Error dari Supabase:", error);
       } else if (data && data.length > 0) {
+        // Gabungkan resep dari Supabase ke array resep
         RESEP = data;
       }
     } catch (e) {
-      console.warn("Gagal memuat dari Supabase, menggunakan data lokal.", e);
+      console.warn("Gagal memuat dari Supabase, memakai data lokal.", e);
     }
   }
 
@@ -465,7 +466,6 @@
     try{ localStorage.setItem("favorit", JSON.stringify(favorit)); }catch(e){}
   }
 
-  // Fungsi Toggle Favorit
   function toggleFavorit(id) {
     const index = favorit.indexOf(id);
     if (index > -1) {
@@ -478,7 +478,7 @@
   }
 
   const $ = id => document.getElementById(id);
-  const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
   const GAMBAR_DEFAULT = "data:image/svg+xml;utf8," + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200">' +
@@ -503,14 +503,12 @@
       e.target.src = GAMBAR_DEFAULT;
     }, {once:true});
 
-    // Event Klik Tombol Hati (Favorit)
     const btnHeart = div.querySelector(".heart-btn");
     btnHeart.addEventListener("click", (e) => {
-      e.stopPropagation(); // Mencegah modal resep terbuka saat mengeklik favorit
+      e.stopPropagation();
       toggleFavorit(r.id);
     });
 
-    // Event Klik Kartu untuk Membuka Pop Up
     div.addEventListener("click", () => bukaDetail(r.id));
     div.addEventListener("keydown", e => {
       if((e.key === "Enter" || e.key === " ") && e.target !== btnHeart){
@@ -523,15 +521,17 @@
   }
 
   function renderDashboard(){
+    // 1. Render Grid Favorit
     const fg = $("favGrid"); fg.innerHTML = "";
-    const daftar = RESEP.filter(r => favorit.includes(r.id));
-    if(!daftar.length){
+    const daftarFav = RESEP.filter(r => favorit.includes(r.id));
+    if(!daftarFav.length){
       fg.innerHTML = '<p class="empty">Belum ada resep favorit. Klik ikon hati pada resep untuk menyimpannya di sini.</p>';
     }
-    daftar.forEach(r => fg.appendChild(kartu(r)));
+    daftarFav.forEach(r => fg.appendChild(kartu(r)));
 
+    // 2. Render Grid Rekomendasi (Tampilkan seluruh resep dari Supabase + Rekomendasi bawaan)
     const rg = $("recGrid"); rg.innerHTML = "";
-    let rek = RESEP.filter(r => REKOMENDASI.includes(r.id) || r.rekomendasi);
+    let rek = RESEP.filter(r => REKOMENDASI_IDS.includes(r.id) || r.rekomendasi !== false);
     if(MAKS_REKOMENDASI > 0) rek = rek.slice(0, MAKS_REKOMENDASI);
     if(!rek.length){
       rg.innerHTML = '<p class="empty">Belum ada rekomendasi resep.</p>';
@@ -539,10 +539,9 @@
     rek.forEach(r => rg.appendChild(kartu(r)));
   }
 
-  // Klik logo: scroll otomatis ke atas
   $("logoBtn").addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
 
-  // ===== Menu pengguna =====
+  // Menu Pengguna
   const userBtn = $("userBtn"), userMenu = $("userMenu");
   userBtn.addEventListener("click", e => {
     e.stopPropagation();
@@ -562,7 +561,7 @@
     }
   });
 
-  // ===== Pop up detail resep =====
+  // Modal Detail Resep
   const modal = $("resepModal");
 
   function bukaDetail(id){
@@ -570,10 +569,15 @@
     if(!r) return;
     $("mJudul").textContent = r.nama;
     $("mKat").textContent   = r.kat;
-    $("mWaktu").textContent = "⏱ " + r.waktu;
-    $("mPorsi").textContent = "🍽 " + r.porsi;
-    $("mBahan").innerHTML   = (r.bahan || []).map(b => `<li>${esc(b)}</li>`).join("");
-    $("mLangkah").innerHTML = (r.langkah || []).map(l => `<li>${esc(l)}</li>`).join("");
+    $("mWaktu").textContent = "⏱ " + (r.waktu || "-");
+    $("mPorsi").textContent = "🍽 " + (r.porsi || "-");
+
+    const bahanList = Array.isArray(r.bahan) ? r.bahan : [];
+    const langkahList = Array.isArray(r.langkah) ? r.langkah : [];
+
+    $("mBahan").innerHTML   = bahanList.map(b => `<li>${esc(b)}</li>`).join("");
+    $("mLangkah").innerHTML = langkahList.map(l => `<li>${esc(l)}</li>`).join("");
+    
     const img = $("mGambar");
     img.onerror = () => { img.onerror = null; img.src = GAMBAR_DEFAULT; };
     img.src = r.gambar || GAMBAR_DEFAULT;
@@ -583,21 +587,12 @@
   }
 
   $("mTutup").addEventListener("click", () => modal.close());
-
   modal.addEventListener("click", e => {
     if(e.target === modal) modal.close();
   });
 
-  function bacaResepUser(){
-    try{
-      const d = JSON.parse(localStorage.getItem("resepSaya"));
-      return Array.isArray(d) ? d : [];
-    }catch(e){ return []; }
-  }
-
-  // Inisialisasi data dan render dashboard
+  // Inisialisasi awal
   muatData().then(() => {
-    RESEP = RESEP.concat(bacaResepUser());
     renderDashboard();
   });
 </script>
