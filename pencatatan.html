@@ -106,7 +106,7 @@
     border:2px solid #fff
   }
 
-  /* TENTANG KAMI / FOOTER */
+ /* FOOTER */
   .about{
     background:#E89149;
     padding:28px 0 20px;
@@ -371,6 +371,20 @@
     cursor:pointer
   }
 
+  /* PILIHAN TAMPIL DI REKOMENDASI / FAVORIT */
+  .cek-wrap{
+    margin-top:10px
+  }
+  .cek{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    font-weight:700;
+    margin:8px 0 0;
+    cursor:pointer
+  }
+
 .page h1 {
   font-size: 18px;
   font-weight: 700;
@@ -594,6 +608,11 @@
 
           <label for="catatan">Catatan Tambahan</label>
           <textarea class="field" id="catatan" rows="3"></textarea>
+
+          <div class="cek-wrap">
+            <label class="cek"><input type="checkbox" id="fRek" checked> Tampilkan Resep di Rekomendasi (Bisa dilihat semua orang) </label>
+            <label class="cek"><input type="checkbox" id="fFav"> Tambahkan Resep ke Favorit (Hanya Anda) </label>
+          </div>
         </div>
 
         <div class="panel">
@@ -896,7 +915,7 @@
       gambar:      fotoData,
       bahan:       bahanTeks,
       langkah:     perBaris($("langkah").value),
-      rekomendasi: false,   // resep dari Pencatatan tidak masuk Rekomendasi
+      rekomendasi: $("fRek").checked,
       milikUser:   true,
       // --- field tambahan khusus halaman ini ---
       persiapan:   persiapan,
@@ -911,10 +930,11 @@
       daftarResep.shift();
       return;
     }
-    // Otomatis masuk Favorit di dashboard
-    const fav = bacaFavorit();
-    fav.push(resep.id);
-    simpanFavorit(fav);
+    if($("fFav").checked){
+      const fav = bacaFavorit();
+      fav.push(resep.id);
+      simpanFavorit(fav);
+    }
 
     tampilkanResep();
     resetForm();
