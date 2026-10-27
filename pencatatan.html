@@ -6,7 +6,8 @@
 <title>Pencatatan</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" >
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
-
+<!-- Supabase SDK JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
   *{
@@ -623,10 +624,10 @@
           <label for="langkah">Langkah Memasak (satu langkah per baris)</label>
           <textarea class="field" id="langkah" rows="6"></textarea>
         </div>
-        <div class="save-row"><button type="submit" class="save">Simpan</button></div>
+        <div class="save-row"><button type="submit" class="save" id="btnSimpan">Simpan</button></div>
       </form>
 
-      <!-- DAFTAR RESEP TERSIMPAN -->
+      <!-- DAFTAR RESEP TERSIMPAN SAYA -->
       <section class="daftar-wrap">
         <h2>DAFTAR RESEP TERSIMPAN</h2>
         <p id="kosong" class="kosong">Belum ada resep yang disimpan.</p>
@@ -661,10 +662,15 @@
 <script>
   const $ = id => document.getElementById(id);
 
+  // ===== KLIEN SUPABASE =====
+  const SUPABASE_URL = 'https://vdvlymemoqkgdpzgndhr.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_-xh3JEbtYgQ5ERgIf3VWGg_L5ETk7_d';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
   // Klik logo: kembali ke dashboard
   $("logoBtn").addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
 
-  // ===== Menu pengguna (Pengaturan & Logout) =====
+  // ===== Menu pengguna =====
   const userBtn = $("userBtn"), userMenu = $("userMenu");
   userBtn.addEventListener("click", e => {
     e.stopPropagation();
@@ -684,39 +690,40 @@
     }
   });
 
-  // ===== Penyimpanan localStorage (dibaca juga oleh index.html) =====
+  // ===== Penyimpanan Lokal Resep Pengguna & Favorit =====
   const KUNCI_RESEP   = "resepSaya";
   const KUNCI_FAVORIT = "favorit";
 
-  function bacaResep(){
+  function bacaResepLokal(){
     try{
       const d = JSON.parse(localStorage.getItem(KUNCI_RESEP));
       return Array.isArray(d) ? d : [];
     }catch(e){ return []; }
   }
-  function simpanResep(){
+
+  function simpanResepLokal(){
     try{
       localStorage.setItem(KUNCI_RESEP, JSON.stringify(daftarResep));
       return true;
     }catch(e){
-      alert("Gagal menyimpan. Penyimpanan browser penuh, coba pakai foto yang lebih kecil.");
+      console.warn("Lokalstorage penuh, foto tidak dapat disimpan secara lokal.", e);
       return false;
     }
   }
+
   function bacaFavorit(){
     try{
       const d = JSON.parse(localStorage.getItem(KUNCI_FAVORIT));
       if(Array.isArray(d)) return d;
     }catch(e){}
-    return [1,2,3,4,5];   // sama dengan daftar favorit awal di index.html
+    return [1,2,3,4,5];
   }
+
   function simpanFavorit(arr){
     try{ localStorage.setItem(KUNCI_FAVORIT, JSON.stringify(arr)); }catch(e){}
   }
 
-  // ===== Pencatatan resep =====
-
-  // Daftar satuan bahan
+  // ===== Interaksi Input Bahan (Grup & Row) =====
   const SATUAN = [
     "gram", "kg", "ml", "liter",
     "sdt", "sdm", "gelas", "cangkir",
@@ -763,13 +770,12 @@
     g.querySelector(".kurangi").onclick = () => kurangiBahan(g);
     g.querySelector(".hapus").onclick = () => { g.remove(); perbaruiGrup(); };
     $("grupList").appendChild(g);
-    tambahBahan(g); // setiap grub dimulai dengan 1 bahan
+    tambahBahan(g);
   }
   $("addGrup").onclick = tambahGrup;
   tambahGrup();
 
-  // Foto resep: diperkecil (maks. lebar 600px) lalu disimpan sebagai data URL
-  // supaya tetap ada setelah halaman di-refresh dan muat di localStorage
+  // ===== Pemrosesan Gambar =====
   let fotoData = "";
   const fotoAwal = $("fotoBox").innerHTML;
 
@@ -799,10 +805,9 @@
   });
   $("fotoBox").addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); $("fotoInput").click(); } });
 
-  // ===== Daftar resep tersimpan (dimuat dari localStorage) =====
-  const daftarResep = bacaResep();   // resep terbaru di urutan pertama
+  // ===== Hanya memuat resep buatan pengguna sendiri (dari localStorage) =====
+  let daftarResep = bacaResepLokal();
 
-  // Hindari karakter HTML berbahaya dari input pengguna
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({
     "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
   }[c]));
@@ -832,7 +837,7 @@
                 <h4>${esc(g.grup) || "Grub " + (n + 1)}</h4>
                 <ul>
                   ${g.items.filter(b => b.nama).map(b => `
-                    <li>${esc(b.nama)} - ${esc(b.jumlah)} ${esc(b.satuan)}</li>
+                    <li>${esc(b.nama)} ${esc(b.jumlah)} ${esc(b.satuan)}</li>
                   `).join("")}
                 </ul>
               `).join("")}
@@ -853,20 +858,31 @@
     `).join("");
   }
 
-  // Tombol hapus resep (event delegation)
-  $("resepList").addEventListener("click", e => {
+  // Hapus Resep lokal (dan dari Supabase jika ada ID nya)
+  $("resepList").addEventListener("click", async e => {
     const btn = e.target.closest(".btn-hapus-resep");
     if(!btn) return;
+
+    const index = Number(btn.dataset.index);
+    const resepDihapus = daftarResep[index];
+
     if(confirm("Hapus resep ini?")){
-      const [dihapus] = daftarResep.splice(Number(btn.dataset.index), 1);
-      simpanResep();
-      // hapus juga dari daftar favorit
+      // Hapus dari Supabase jika resep tersebut punya ID database
+      if(resepDihapus && resepDihapus.dbId) {
+        try {
+          await supabaseClient.from('resep').delete().eq('id', resepDihapus.dbId);
+        } catch(err) {
+          console.warn("Gagal menghapus dari Supabase:", err);
+        }
+      }
+
+      const [dihapus] = daftarResep.splice(index, 1);
+      simpanResepLokal();
       simpanFavorit(bacaFavorit().filter(id => id !== dihapus.id));
       tampilkanResep();
     }
   });
 
-  // Reset form setelah simpan
   function resetForm(){
     $("noteForm").reset();
     $("grupList").innerHTML = "";
@@ -878,10 +894,13 @@
 
   const perBaris = t => t.split("\n").map(x => x.trim()).filter(Boolean);
 
-  $("noteForm").addEventListener("submit", e => {
+  // ===== Simpan Resep (Disimpan Lokal & Dikirim ke Supabase) =====
+  $("noteForm").addEventListener("submit", async e => {
     e.preventDefault();
+    const btnSimpan = $("btnSimpan");
+    btnSimpan.disabled = true;
+    btnSimpan.textContent = "Menyimpan...";
 
-    // Kumpulkan data bahan: grub -> nama, jumlah, satuan
     const bahanGrup = [...document.querySelectorAll(".grup")].map(g => ({
       grup: g.querySelector(".nama-grup").value,
       items: [...g.querySelectorAll(".bahan-row")].map(r => ({
@@ -891,7 +910,6 @@
       }))
     }));
 
-    // Versi teks datar, dipakai index.html untuk pop up detail resep
     const bahanTeks = bahanGrup.flatMap(g =>
       g.items.filter(b => b.nama.trim()).map(b =>
         b.nama.trim() + " - " + [b.jumlah, b.satuan].filter(Boolean).join(" ")
@@ -905,9 +923,10 @@
       memasak   && "Memasak " + memasak
     ].filter(Boolean).join(", ") || "-";
 
-    const resep = {
-      // --- field yang dibaca index.html ---
-      id:          Date.now(),
+    const localId = Date.now();
+
+    const resepBaru = {
+      id:          localId,
       nama:        $("judul").value.trim(),
       kat:         $("kategori").value,
       waktu:       waktu,
@@ -917,7 +936,6 @@
       langkah:     perBaris($("langkah").value),
       rekomendasi: $("fRek").checked,
       milikUser:   true,
-      // --- field tambahan khusus halaman ini ---
       persiapan:   persiapan,
       memasak:     memasak,
       kesulitan:   $("kesulitan").value,
@@ -925,22 +943,46 @@
       bahanGrup:   bahanGrup
     };
 
-    daftarResep.unshift(resep);       // resep terbaru tampil paling atas
-    if(!simpanResep()){               // gagal simpan: batalkan
-      daftarResep.shift();
-      return;
+    // 1. Kirim data resep ke Supabase
+    try {
+      const { data, error } = await supabaseClient
+        .from('resep')
+        .insert([{
+          nama:        resepBaru.nama,
+          kat:         resepBaru.kat,
+          waktu:       resepBaru.waktu,
+          porsi:       resepBaru.porsi,
+          gambar:      resepBaru.gambar,
+          bahan:       resepBaru.bahan,
+          langkah:     resepBaru.langkah
+        }])
+        .select();
+
+      if (!error && data && data.length > 0) {
+        resepBaru.dbId = data[0].id; // simpan ID database
+      }
+    } catch(err) {
+      console.warn("Gagal mengirim resep ke Supabase:", err);
     }
+
+    // 2. Simpan ke daftar resep lokal pengguna
+    daftarResep.unshift(resepBaru);
+    simpanResepLokal();
+
     if($("fFav").checked){
       const fav = bacaFavorit();
-      fav.push(resep.id);
+      fav.push(resepBaru.id);
       simpanFavorit(fav);
     }
 
     tampilkanResep();
     resetForm();
-    alert("Resep \"" + resep.nama + "\" tersimpan.");
+    btnSimpan.disabled = false;
+    btnSimpan.textContent = "Simpan";
+    alert("Resep \"" + resepBaru.nama + "\" berhasil disimpan.");
   });
 
+  // Tampilkan data resep lokal pengguna saat pertama dibuka
   tampilkanResep();
 </script>
 

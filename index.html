@@ -7,6 +7,7 @@
 <title>Dashboard</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" >
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 
   *{box-sizing:border-box;margin:0;padding:0}
@@ -145,12 +146,30 @@
     color:#222
   }
 
-  .heart{
-    position:absolute;
-    top:10px;
-    right:12px;
-    font-size:28px;
-    line-height:1;color:#d90000
+  /* CSS Tombol Favorit Interactive */
+  .heart-btn {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 5;
+    color: rgba(200, 200, 200, 0.8);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    transition: transform 0.2s, color 0.2s;
+    padding: 0;
+  }
+
+  .heart-btn:hover {
+    transform: scale(1.2);
+  }
+
+  .heart-btn.active {
+    color: #d90000;
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9);
   }
 
   .empty{
@@ -309,7 +328,6 @@
     background:#f3e3d3
   }
   .card-teks{padding:10px 14px}
-  .heart{text-shadow:0 1px 3px rgba(255,255,255,.9)}
 
   /* Gambar di pop up */
   .resep-img{
@@ -414,85 +432,52 @@
 </footer>
 
 <script>
-  // ===== Data resep favorit dan rekomendasi =====
-  let RESEP = [
-    {id:1, nama:"Nasi Goreng Spesial", kat:"Hidangan Utama", waktu:"20 menit", porsi:"2 porsi",
-     gambar:"img/nasi-goreng.jpg",
-     bahan:["2 piring nasi putih","2 butir telur","3 siung bawang putih","2 siung bawang merah","2 sdm kecap manis","Garam & merica secukupnya","Daun bawang, irisan"],
-     langkah:["Haluskan bawang putih dan bawang merah, lalu tumis hingga harum.","Masukkan telur, orak-arik hingga matang.","Tambahkan nasi, kecap, garam, dan merica. Aduk rata.","Taburi daun bawang, sajikan hangat."]},
-    {id:2, nama:"Ayam Rendang", kat:"Hidangan Utama", waktu:"60 menit", porsi:"4 porsi",
-     gambar:"img/ayam-rendang.jpg",
-     bahan:["500 g ayam, potong","400 ml santan","2 lembar daun jeruk","1 batang serai, memarkan","Bumbu halus: bawang merah, bawang putih, cabai, jahe, lengkuas, kunyit"],
-     langkah:["Tumis bumbu halus bersama serai dan daun jeruk hingga harum.","Masukkan ayam, aduk hingga berubah warna.","Tuang santan, masak dengan api kecil sambil sesekali diaduk.","Masak hingga kuah mengental dan bumbu meresap."]},
-    {id:3, nama:"Risol Kentang", kat:"Cemilan", waktu:"45 menit", porsi:"10 buah",
-     gambar:"img/risol-kentang.jpg",
-     bahan:["3 buah kentang, kukus lalu haluskan","10 lembar kulit risol","1 sdm margarin","Garam, merica, pala secukupnya","Tepung roti untuk melapisi"],
-     langkah:["Campur kentang halus dengan margarin, garam, merica, dan pala.","Isi kulit risol dengan adonan, lipat rapat.","Celupkan ke adonan tepung, lalu gulingkan pada tepung roti.","Goreng hingga kuning keemasan."]},
-    {id:4, nama:"Udang Balado", kat:"Cemilan", waktu:"25 menit", porsi:"3 porsi",
-     gambar:"img/udang-balado.jpg",
-     bahan:["300 g udang, bersihkan","8 cabai merah","3 siung bawang putih","3 siung bawang merah","1 buah tomat","Garam, gula, dan perasan jeruk nipis"],
-     langkah:["Goreng udang sebentar hingga setengah matang, angkat.","Haluskan cabai, bawang, dan tomat, lalu tumis hingga matang.","Masukkan udang, tambahkan garam, gula, dan jeruk nipis.","Aduk rata dan masak hingga bumbu meresap."]},
-    {id:5, nama:"Gulai Pakis", kat:"Sayuran", waktu:"30 menit", porsi:"4 porsi",
-     gambar:"img/gulai-pakis.jpg",
-     bahan:["250 g pakis, potong-potong","300 ml santan","2 lembar daun salam","1 batang serai","Bumbu halus: bawang merah, bawang putih, kunyit, cabai, kemiri"],
-     langkah:["Tumis bumbu halus bersama salam dan serai hingga harum.","Masukkan pakis, aduk sebentar.","Tuang santan dan masak dengan api kecil hingga pakis empuk.","Koreksi rasa, sajikan."]},
-    {id:6, nama:"Pindang Serani Kuah Kuning", kat:"Hidangan Utama", waktu:"40 menit", porsi:"4 porsi",
-     gambar:"img/pindang-serani.jpg",
-     bahan:["1 ekor ikan serani, potong","1 ruas kunyit","3 buah cabai rawit","2 batang serai","1 buah tomat","Belimbing wuluh atau asam jawa","Garam secukupnya"],
-     langkah:["Rebus air bersama serai dan bumbu halus hingga mendidih.","Masukkan ikan, masak dengan api sedang.","Tambahkan tomat, cabai rawit, dan belimbing wuluh.","Masak hingga ikan matang dan kuah beraroma segar."]},
-    {id:7, nama:"Bolu Coklat Lumer", kat:"Makanan Penutup", waktu:"50 menit", porsi:"8 potong",
-     gambar:"img/bolu-coklat.jpg",
-     bahan:["150 g tepung terigu","100 g gula pasir","3 butir telur","100 g dark chocolate","100 g mentega","1 sdt baking powder"],
-     langkah:["Lelehkan coklat dan mentega, dinginkan sebentar.","Kocok telur dan gula hingga mengembang.","Masukkan tepung dan baking powder, lalu campurkan lelehan coklat.","Panggang pada suhu 170°C selama 25–30 menit."]},
-    {id:8, nama:"Asem Bandeng Tradisional", kat:"Hidangan Utama", waktu:"45 menit", porsi:"4 porsi",
-     gambar:"img/asem-bandeng.jpg",
-     bahan:["1 ekor ikan bandeng","3 buah tomat hijau","5 buah cabai rawit","2 batang serai","Asam jawa secukupnya","Bawang merah dan bawang putih"],
-     langkah:["Didihkan air bersama bawang, serai, dan asam jawa.","Masukkan ikan bandeng yang sudah dibersihkan.","Tambahkan tomat dan cabai rawit.","Masak hingga ikan matang dan kuah terasa segar asam."]},
-    {id:9, nama:"Nasi Gudeg", kat:"Hidangan Utama", waktu:"120 menit", porsi:"5 porsi",
-     gambar:"img/nasi-gudeg.jpg",
-     bahan:["500 g nangka muda","500 ml santan","3 lembar daun salam","Gula merah secukupnya","Telur rebus & ayam opsional","Bumbu halus: bawang merah, bawang putih, kemiri, ketumbar"],
-     langkah:["Rebus nangka muda hingga agak empuk, tiriskan.","Tumis bumbu halus, masukkan nangka dan daun salam.","Tuang santan dan gula merah, masak dengan api kecil.","Masak lama hingga kuah menyusut dan warna kecokelatan."]},
-    {id:10, nama:"Martabak Keju", kat:"Makanan Penutup", waktu:"40 menit", porsi:"4 potong",
-     gambar:"img/martabak-keju.jpg",
-     bahan:["250 g tepung terigu","1 sdt ragi instan","1 butir telur","250 ml air","Keju parut","Susu kental manis","Mentega"],
-     langkah:["Campur tepung, ragi, telur, dan air; diamkan 30 menit.","Tuang adonan ke teflon, masak hingga berlubang di permukaan.","Olesi mentega, taburi keju dan susu kental manis.","Lipat, potong, dan sajikan hangat."]}
-  ];
-  
-  // ===== Rekomendasi: jumlahnya fleksibel, mengikuti data dari database =====
-  // Isi API_URL dengan alamat endpoint, mis. "api/resep.php".
-  // Format JSON yang diharapkan:
-  // { "resep": [ {id, nama, kat, waktu, porsi, gambar, bahan:[...], langkah:[...]}, ... ],
-  //   "rekomendasi": [6, 7, 8, ...] }   <- daftar id resep yang direkomendasikan
-  // Kalau API_URL kosong atau gagal dimuat, data contoh di atas yang dipakai.
-  const API_URL = "";
-  const MAKS_REKOMENDASI = 0;   // 0 = tampilkan semua, atau isi angka untuk membatasi
-  let REKOMENDASI = [6,7,8,9,10];
+  // ===== Variabel Rekomendasi =====
+  const MAKS_REKOMENDASI = 0;
+  let REKOMENDASI = [6, 7, 8, 9, 10, 11, 12, 13, 14];
 
-  async function muatData(){
-    if(!API_URL) return;
-    try{
-      const res = await fetch(API_URL);
-      if(!res.ok) throw new Error("HTTP " + res.status);
-      const data = await res.json();
-      if(Array.isArray(data.resep)) RESEP = data.resep;
-      if(Array.isArray(data.rekomendasi)) REKOMENDASI = data.rekomendasi;
-    }catch(e){
-      console.warn("Gagal memuat dari database, memakai data contoh.", e);
+  // ===== Konfigurasi Supabase Client =====
+  const SUPABASE_URL = 'https://vdvlymemoqkgdpzgndhr.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_-xh3JEbtYgQ5ERgIf3VWGg_L5ETk7_d';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
+
+  async function muatData() {
+    try {
+      const { data, error } = await supabaseClient.from('resep').select('*'); 
+      if (error) {
+        console.error("Error dari Supabase:", error);
+      } else if (data && data.length > 0) {
+        RESEP = data;
+      }
+    } catch (e) {
+      console.warn("Gagal memuat dari Supabase, menggunakan data lokal.", e);
     }
   }
 
-  // ===== Favorit (disimpan di localStorage/database kalau ada) =====
+  // ===== Favorit =====
   let favorit = [1,2,3,4,5];
   try{
     const s = localStorage.getItem("favorit");
     if(s) favorit = JSON.parse(s);
   }catch(e){}
+
   function simpanFavorit(){
     try{ localStorage.setItem("favorit", JSON.stringify(favorit)); }catch(e){}
   }
 
+  // Fungsi Toggle Favorit
+  function toggleFavorit(id) {
+    const index = favorit.indexOf(id);
+    if (index > -1) {
+      favorit.splice(index, 1);
+    } else {
+      favorit.push(id);
+    }
+    simpanFavorit();
+    renderDashboard();
+  }
+
   const $ = id => document.getElementById(id);
-  // Amankan teks buatan pengguna sebelum dimasukkan ke innerHTML
   const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
   const GAMBAR_DEFAULT = "data:image/svg+xml;utf8," + encodeURIComponent(
@@ -501,40 +486,49 @@
     '<text x="50%" y="50%" font-size="60" text-anchor="middle" dominant-baseline="middle">🍽</text></svg>'
   );
 
-  function kartu(r, opsi = {}){
+  function kartu(r){
+    const isFav = favorit.includes(r.id);
     const div = document.createElement("div");
     div.className = "card";
     div.tabIndex = 0;
     div.setAttribute("role", "button");
     div.setAttribute("aria-label", "Lihat detail " + r.nama);
+    
     div.innerHTML = `
+      <button class="heart-btn ${isFav ? 'active' : ''}" aria-label="Tambah/Hapus Favorit">&#10084;</button>
       <img class="card-img" src="${esc(r.gambar || GAMBAR_DEFAULT)}" alt="${esc(r.nama)}" loading="lazy">
       <div class="card-teks"><h3>${esc(r.nama)}</h3><small>${esc(r.kat)}</small></div>`;
-    // Kalau file gambar tidak ditemukan, pakai gambar pengganti
+    
     div.querySelector("img").addEventListener("error", e => {
       e.target.src = GAMBAR_DEFAULT;
     }, {once:true});
-    if(opsi.heartStatis){
-      div.insertAdjacentHTML("afterbegin", '<span class="heart" aria-label="Favorit">&#10084;</span>');
-    }
+
+    // Event Klik Tombol Hati (Favorit)
+    const btnHeart = div.querySelector(".heart-btn");
+    btnHeart.addEventListener("click", (e) => {
+      e.stopPropagation(); // Mencegah modal resep terbuka saat mengeklik favorit
+      toggleFavorit(r.id);
+    });
+
+    // Event Klik Kartu untuk Membuka Pop Up
     div.addEventListener("click", () => bukaDetail(r.id));
     div.addEventListener("keydown", e => {
-      if(e.key === "Enter" || e.key === " "){
+      if((e.key === "Enter" || e.key === " ") && e.target !== btnHeart){
         e.preventDefault();
         bukaDetail(r.id);
       }
     });
+    
     return div;
   }
-
 
   function renderDashboard(){
     const fg = $("favGrid"); fg.innerHTML = "";
     const daftar = RESEP.filter(r => favorit.includes(r.id));
     if(!daftar.length){
-      fg.innerHTML = '<p class="empty">Belum ada resep favorit. Buka menu Kategori lalu tekan ikon hati pada resep.</p>';
+      fg.innerHTML = '<p class="empty">Belum ada resep favorit. Klik ikon hati pada resep untuk menyimpannya di sini.</p>';
     }
-    daftar.forEach(r => fg.appendChild(kartu(r, {heartStatis:true})));
+    daftar.forEach(r => fg.appendChild(kartu(r)));
 
     const rg = $("recGrid"); rg.innerHTML = "";
     let rek = RESEP.filter(r => REKOMENDASI.includes(r.id) || r.rekomendasi);
@@ -545,10 +539,10 @@
     rek.forEach(r => rg.appendChild(kartu(r)));
   }
 
-  // Klik logo: scroll otomatis ke atas (kembali ke dashboard)
+  // Klik logo: scroll otomatis ke atas
   $("logoBtn").addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
 
-  // ===== Menu pengguna (Pengaturan & Logout) =====
+  // ===== Menu pengguna =====
   const userBtn = $("userBtn"), userMenu = $("userMenu");
   userBtn.addEventListener("click", e => {
     e.stopPropagation();
@@ -590,13 +584,10 @@
 
   $("mTutup").addEventListener("click", () => modal.close());
 
-  // Klik di luar kotak (area gelap) menutup pop up
   modal.addEventListener("click", e => {
     if(e.target === modal) modal.close();
   });
 
-  // ===== Terima resep dari halaman Pencatatan (localStorage "resepSaya") =====
-  // Resep ditambahkan di pencatatan.html; di sini hanya dibaca dan ditampilkan.
   function bacaResepUser(){
     try{
       const d = JSON.parse(localStorage.getItem("resepSaya"));
@@ -604,7 +595,7 @@
     }catch(e){ return []; }
   }
 
-  // Muat data (database kalau ada), lalu gabungkan dengan resep dari Pencatatan
+  // Inisialisasi data dan render dashboard
   muatData().then(() => {
     RESEP = RESEP.concat(bacaResepUser());
     renderDashboard();
