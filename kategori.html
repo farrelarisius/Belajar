@@ -340,6 +340,71 @@
     color: #888;
     padding: 20px 0;
   }
+
+  /* ===== POPUP RESEP KATEGORI =====
+     Memakai <dialog> bawaan browser, jadi tidak bergantung pada
+     Bootstrap 5 maupun Bootstrap 6 (keduanya punya modal yang berbeda). */
+  #modalResep {
+    border: 0;
+    border-radius: 12px;
+    padding: 0;
+    margin: auto;
+    width: min(900px, 92vw);
+    max-height: 85vh;
+    background: #fff;
+    color: #333;
+    overflow: hidden;
+  }
+  #modalResep[open] { display: flex; flex-direction: column; }
+  #modalResep::backdrop { background: rgba(0,0,0,.55); }
+
+  .mr-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #E89149;
+    color: #fff;
+    padding: 12px 16px;
+  }
+  .mr-head h3 { font-size: 18px; margin: 0; }
+  .mr-x {
+    background: none; border: 0; color: #fff;
+    font-size: 26px; line-height: 1; cursor: pointer;
+  }
+  .mr-body { padding: 16px; overflow-y: auto; background: #FEE8D6; }
+  .mr-foot { padding: 10px 16px; text-align: right; border-top: 1px solid #eee; background: #fff; }
+  .mr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 14px;
+  }
+  .card-resep {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,.08);
+    display: flex;
+    flex-direction: column;
+  }
+  .card-resep img { width: 100%; height: 140px; object-fit: cover; display: block; background: #eee; }
+  .card-resep-body { padding: 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .card-resep-title { font-size: 15px; font-weight: 700; }
+  .card-resep-info { font-size: 12px; color: #777; }
+  .mr-btn {
+    display: block; width: 100%;
+    padding: 7px 12px;
+    border: 1px solid #E8690F; border-radius: 6px;
+    background: #fff; color: #E8690F;
+    font-size: 13px; cursor: pointer; margin-top: auto;
+  }
+  .mr-btn:hover { background: #E8690F; color: #fff; }
+  .mr-btn.abu { border-color: #888; color: #555; width: auto; display: inline-block; margin: 0 0 12px; }
+  .mr-btn.abu:hover { background: #888; color: #fff; }
+  .mr-kosong { text-align: center; color: #666; padding: 30px 0; }
+  .mr-detail { background: #fff; border-radius: 10px; padding: 16px; }
+  .mr-detail img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; }
+  .mr-detail h4 { margin: 14px 0 6px; color: #E8690F; }
+  .mr-detail ul, .mr-detail ol { padding-left: 22px; line-height: 1.6; }
 </style>
 </head>
 
@@ -351,7 +416,7 @@
   <nav class="nav-right">
     <ul class="nav-links">
       <li><a href="index.html">Dashboard</a></li>
-      <li><a href="kategori.html" data-nama="Kategori">Kategori</a></li>
+      <li><a href="kategori.html" data-nama="Kategori" class="active">Kategori</a></li>
       <li><a href="pencatatan.html">Pencatatan</a></li>
       <li><a href="perencanaan.html" data-nama="Perencanaan">Perencanaan</a></li>
     </ul>
@@ -412,6 +477,16 @@
 
     </main>
   </div>
+
+  <!-- POPUP RESEP DALAM KATEGORI -->
+  <dialog id="modalResep" aria-labelledby="modalResepJudul">
+    <div class="mr-head">
+      <h3 id="modalResepJudul">Resep Kategori</h3>
+      <button type="button" class="mr-x" id="modalResepX" aria-label="Tutup">&times;</button>
+    </div>
+    <div class="mr-body" id="kontenResepKategori"></div>
+    <div class="mr-foot"><button type="button" class="mr-btn abu" id="modalResepTutup" style="margin:0">Tutup</button></div>
+  </dialog>
 
   <footer class="about">
   <div class="container">
@@ -581,6 +656,42 @@
     "Ikan"
   ];
 
+  // ===== HELPER KATEGORI & RESEP =====
+  const CARI_DI_NAMA = true;   // true: kategori "Ayam" juga mencocokkan resep bernama "Ayam Rendang"
+  let KATEGORI_MAP = {};       // id kategori -> nama kategori (dari tabel 'kategori')
+
+  const PLACEHOLDER_IMG = "data:image/svg+xml;utf8," + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150"><rect width="100%" height="100%" fill="#eee"/><text x="50%" y="50%" fill="#999" font-size="14" text-anchor="middle" dy=".3em">No Image</text></svg>'
+  );
+
+  // Ambil nama kategori dari berbagai kemungkinan nama kolom
+  function namaKategoriResep(r) {
+    const raw = r.kat ?? r.kategori ?? r.nama_kategori ?? r.kategori_id ?? r.id_kategori ?? "";
+    if (KATEGORI_MAP[raw] !== undefined) return KATEGORI_MAP[raw]; // kalau berupa id
+    return String(raw);
+  }
+
+  // Dipakai bersama oleh penghitung jumlah & popup, supaya angkanya selalu konsisten
+  function resepDalamKategori(namaKat, semuaResep) {
+    const k = namaKat.toLowerCase().trim();
+    return semuaResep.filter(r => {
+      if (!r) return false;
+      const kat = namaKategoriResep(r).toLowerCase().trim();
+      const nama = String(r.nama || r.nama_resep || "").toLowerCase();
+      return kat === k || (CARI_DI_NAMA && k.length > 2 && nama.includes(k));
+    });
+  }
+
+  // bahan/langkah bisa berupa array, JSON string, atau teks biasa
+  function keArray(v) {
+    if (Array.isArray(v)) return v;
+    if (typeof v === "string" && v.trim()) {
+      try { const p = JSON.parse(v); if (Array.isArray(p)) return p; } catch (e) {}
+      return v.split("\n").filter(Boolean);
+    }
+    return [];
+  }
+
   // ===== Ambil Seluruh Resep (Supabase + Lokal + Default) =====
   function ambilSemuaResep() {
     daftarResep = bacaResepLokal();
@@ -595,13 +706,7 @@
 
   // ===== Hitung Jumlah Resep Sesuai Kategori =====
   function hitungResepKategori(namaKat, daftarSemuaResep) {
-    const k = namaKat.toLowerCase().trim();
-    return daftarSemuaResep.filter(r => {
-      if(!r) return false;
-      const katResep = String(r.kat || "").toLowerCase().trim();
-      const namaResep = String(r.nama || "").toLowerCase();
-      return katResep === k || (k.length > 2 && namaResep.includes(k));
-    }).length;
+    return resepDalamKategori(namaKat, daftarSemuaResep).length;
   }
 
   // ===== Render Grid Kategori =====
@@ -624,9 +729,8 @@
 
     // 3. Kategori dari resep yang tersimpan di database dan lokal
     semuaResep.forEach(r => {
-      if (r.kat && typeof r.kat === "string" && r.kat.trim()) {
-        setKategori.add(r.kat.trim());
-      }
+      const nama = namaKategoriResep(r).trim();
+      if (nama) setKategori.add(nama);
     });
 
     const daftarKategori = Array.from(setKategori);
@@ -640,7 +744,7 @@
       const jumlahResep = hitungResepKategori(namaKat, semuaResep);
       const li = document.createElement("li");
       li.innerHTML = `
-        <a href="#" class="kartu">
+        <a href="#" class="kartu" data-kategori="${esc(namaKat)}">
           <span class="kartu-nama">${esc(namaKat)}</span>
           <span class="kartu-jumlah">${jumlahResep} Resep</span>
         </a>
@@ -665,6 +769,7 @@
 
         if (!katError && katData && katData.length > 0) {
           kategoriDariDB = katData;
+          katData.forEach(k => { KATEGORI_MAP[k.id] = k.nama || k.nama_kategori; });
         }
       } catch (errKat) {
         // Abaikan jika tabel kategori belum dibuat di Supabase
@@ -679,7 +784,6 @@
       if (error) {
         console.error("Error dari Supabase:", error);
       } else if (data && data.length > 0) {
-        // Gabungkan resep dari Supabase ke array resep
         RESEP = data;
       }
     } catch (e) {
@@ -747,6 +851,65 @@
     daftarRiwayat.prepend(li);
   }
 
+  // ===== POPUP RESEP PER KATEGORI =====
+  const modalResep = $("modalResep");
+  const kontenResep = $("kontenResepKategori");
+  const judulModal = $("modalResepJudul");
+
+  function tampilkanResepKategori(namaKategori) {
+    const hasil = resepDalamKategori(namaKategori, ambilSemuaResep());
+    judulModal.textContent = `Resep Kategori: ${namaKategori}`;
+
+    if (hasil.length === 0) {
+      kontenResep.innerHTML = `<div class="mr-kosong">Belum ada resep untuk kategori <strong>${esc(namaKategori)}</strong>.</div>`;
+    } else {
+      kontenResep.innerHTML = `<div class="mr-grid">` + hasil.map(r => `
+        <div class="card-resep">
+          <img src="${esc(r.gambar || r.gambar_url || PLACEHOLDER_IMG)}" alt="${esc(r.nama || r.nama_resep)}"
+               onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'">
+          <div class="card-resep-body">
+            <div class="card-resep-title">${esc(r.nama || r.nama_resep)}</div>
+            <div class="card-resep-info">⏱️ ${esc(r.waktu || '-')} | 🍽️ ${esc(r.porsi || '-')}</div>
+            <button type="button" class="mr-btn btn-detail" data-id="${esc(r.id)}" data-kat="${esc(namaKategori)}">Lihat Detail</button>
+          </div>
+        </div>`).join("") + `</div>`;
+    }
+    kontenResep.scrollTop = 0;
+    if (!modalResep.open) modalResep.showModal();
+  }
+
+  function tampilkanDetailResep(id, namaKategori) {
+    const r = ambilSemuaResep().find(x => String(x.id) === String(id));
+    if (!r) return;
+    const bahan = keArray(r.bahan).map(b => `<li>${esc(b)}</li>`).join("");
+    const langkah = keArray(r.langkah).map(l => `<li>${esc(l)}</li>`).join("");
+
+    judulModal.textContent = r.nama || r.nama_resep;
+    kontenResep.innerHTML = `
+      <div class="mr-detail">
+        <button type="button" class="mr-btn abu btn-kembali" data-kat="${esc(namaKategori)}">← Kembali</button>
+        <img src="${esc(r.gambar || r.gambar_url || PLACEHOLDER_IMG)}" alt="${esc(r.nama || r.nama_resep)}"
+             onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'">
+        <p class="card-resep-info">⏱️ ${esc(r.waktu || '-')} | 🍽️ ${esc(r.porsi || '-')}</p>
+        <h4>Bahan</h4><ul>${bahan || "<li>-</li>"}</ul>
+        <h4>Langkah</h4><ol>${langkah || "<li>-</li>"}</ol>
+      </div>`;
+    kontenResep.scrollTop = 0;
+  }
+
+  // Tombol di dalam popup (event delegation)
+  kontenResep.addEventListener("click", e => {
+    const detail = e.target.closest(".btn-detail");
+    if (detail) return tampilkanDetailResep(detail.dataset.id, detail.dataset.kat);
+    const kembali = e.target.closest(".btn-kembali");
+    if (kembali) return tampilkanResepKategori(kembali.dataset.kat);
+  });
+
+  // Menutup popup: tombol X, tombol Tutup, klik area gelap di luar popup
+  $("modalResepX").addEventListener("click", () => modalResep.close());
+  $("modalResepTutup").addEventListener("click", () => modalResep.close());
+  modalResep.addEventListener("click", e => { if (e.target === modalResep) modalResep.close(); });
+
   // Event Listeners Pencarian
   kolomCari.addEventListener("input", e => {
     filterKategori(e.target.value);
@@ -782,17 +945,13 @@
     });
   }
 
-  // Klik kartu kategori untuk langsung memfilter
+  // Klik kartu kategori: tampilkan resep yang masuk kategori tersebut
   gridKategori.addEventListener("click", e => {
     const kartu = e.target.closest(".kartu");
     if (kartu) {
       e.preventDefault();
-      const nama = kartu.querySelector(".kartu-nama")?.textContent;
-      if (nama) {
-        kolomCari.value = nama;
-        filterKategori(nama);
-        tambahRiwayat(nama);
-      }
+      const nama = kartu.dataset.kategori || kartu.querySelector(".kartu-nama")?.textContent;
+      if (nama) tampilkanResepKategori(nama);
     }
   });
 
