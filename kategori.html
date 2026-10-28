@@ -341,6 +341,11 @@
     padding: 20px 0;
   }
 
+  /* ===== TATA LETAK: PENCARIAN DI ATAS, KATEGORI DI BAWAH ===== */
+  .bagian-pencarian { margin-top: 0; margin-bottom: 24px; }
+  .bagian-kategori { margin-top: 0; }
+  .kepala-kategori { justify-content: flex-end; }
+
   /* ===== POPUP RESEP KATEGORI =====
      Memakai <dialog> bawaan browser, jadi tidak bergantung pada
      Bootstrap 5 maupun Bootstrap 6 (keduanya punya modal yang berbeda). */
@@ -444,22 +449,6 @@
 
     <main class="konten">
 
-      <!-- Kategori resep -->
-      <section class="bagian-kategori" aria-labelledby="judul-kategori">
-        <div class="kepala-kategori">
-          <div>
-            <h2 id="judul-kategori">KATEGORI RESEP</h2>
-            <p class="subjudul">Jelajahi Resep Terbaik Untuk Hari Ini</p>
-          </div>
-          <a href="#" class="tombol-semua" id="btnSemuaKategori">Semua Kategori</a>
-        </div>
-
-        <ul class="grid-kategori" id="gridKategori">
-          <!-- Data kategori dari Supabase akan di-render di sini -->
-          <li class="pesan-kosong">Memuat data kategori...</li>
-        </ul>
-      </section>
-
       <!-- Pencarian resep -->
       <section class="bagian-pencarian" aria-labelledby="judul-pencarian">
         <h2 id="judul-pencarian">CARI KATEGORI</h2>
@@ -472,6 +461,18 @@
 
         <h3 class="judul-riwayat">Pencarian sebelumnya</h3>
         <ul class="riwayat" id="daftarRiwayat">
+        </ul>
+      </section>
+
+      <!-- Kategori resep -->
+      <section class="bagian-kategori" aria-label="Kategori resep">
+        <div class="kepala-kategori">
+          <a href="#" class="tombol-semua" id="btnSemuaKategori">Semua Kategori</a>
+        </div>
+
+        <ul class="grid-kategori" id="gridKategori">
+          <!-- Data kategori dari Supabase akan di-render di sini -->
+          <li class="pesan-kosong">Memuat data kategori...</li>
         </ul>
       </section>
 
