@@ -12,51 +12,26 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-  /* ===== CAROUSEL GAMBAR =====
-     Dibuat manual (tanpa komponen carousel Bootstrap) supaya tidak bentrok
-     antara Bootstrap 5 dan Bootstrap 6 yang dipasang bersamaan. */
-  .cr {
-    position: relative;
-    overflow: hidden;
-    border-radius: 18px;
-    width: 100%;
-    max-width: 900px;      /* lebar maksimal carousel, ubah sesuai selera */
-    margin: 0 auto 28px;   /* auto kiri-kanan = tepat di tengah */
-    background: #f3e3d3;
-    aspect-ratio: 16 / 6;
-    min-height: 180px;
-    max-height: 360px;
+  /* ===== PENCARIAN RESEP ===== */
+  .cari-form {
+    display: flex; gap: 10px;
+    width: 100%; max-width: 900px;   /* lebar maksimal kolom pencarian */
+    margin: 0 auto 28px;
   }
-  .cr-track { display: flex; height: 100%; transition: transform .6s ease; }
-  .cr-slide { position: relative; flex: 0 0 100%; height: 100%; }
-  .cr-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .cr-cap {
-    position: absolute; left: 0; right: 0; bottom: 0;
-    padding: 28px 22px 34px;
-    color: #fff;
-    background: linear-gradient(transparent, rgba(0,0,0,.6));
+  .cari-form input {
+    flex: 1; min-width: 0;
+    padding: 11px 14px;
+    border: 1px solid #ccc; border-radius: 8px;
+    font-size: 14px; background: #fff;
   }
-  .cr-cap h3 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
-  .cr-cap p  { font-size: 13px; margin: 0; }
-  .cr-nav {
-    position: absolute; top: 50%; transform: translateY(-50%);
-    width: 38px; height: 38px; border: 0; border-radius: 50%;
-    background: rgba(255,255,255,.8); color: #E8690F;
-    font-size: 24px; line-height: 1; cursor: pointer;
+  .cari-form input:focus { outline: 2px solid #E8690F; border-color: #E8690F; }
+  .cari-form button {
+    padding: 11px 22px; border: 0; border-radius: 8px;
+    background: #E8690F; color: #fff; font-size: 14px; cursor: pointer;
   }
-  .cr-nav:hover { background: #fff; }
-  .cr-prev { left: 12px; }
-  .cr-next { right: 12px; }
-  .cr-dots {
-    position: absolute; left: 0; right: 0; bottom: 10px;
-    display: flex; justify-content: center; gap: 8px;
-  }
-  .cr-dot {
-    width: 10px; height: 10px; padding: 0; border: 0; border-radius: 50%;
-    background: rgba(255,255,255,.55); cursor: pointer;
-  }
-  .cr-dot.aktif { background: #E8690F; }
-  @media (prefers-reduced-motion: reduce) { .cr-track { transition: none; } }
+  .cari-form button:hover { background: #d15805; }
+  #hasilCari { margin-bottom: 28px; }
+  #hasilCari[hidden] { display: none; }
 </style>
 </head>
 
@@ -96,13 +71,16 @@
   <div class="dashboard">
       <h1>DASHBOARD</h1>
 
-      <!-- CAROUSEL: isi gambar & teks diatur di CAROUSEL_SLIDES (bagian <script>) -->
-      <section class="cr" id="carousel" aria-roledescription="carousel" aria-label="Banner">
-        <div class="cr-track" id="crTrack"></div>
-        <button type="button" class="cr-nav cr-prev" id="crPrev" aria-label="Slide sebelumnya">&#8249;</button>
-        <button type="button" class="cr-nav cr-next" id="crNext" aria-label="Slide berikutnya">&#8250;</button>
-        <div class="cr-dots" id="crDots"></div>
-      </section>
+      <!-- PENCARIAN RESEP -->
+      <form class="cari-form" id="formCariResep" role="search">
+        <input type="search" id="kolomCari" placeholder="Cari resep berdasarkan nama, kategori, atau bahan..." autocomplete="off" aria-label="Cari resep">
+        <button type="submit">Cari</button>
+      </form>
+
+      <div id="hasilCari" hidden>
+        <h2 id="judulHasil">HASIL PENCARIAN</h2>
+        <div class="grid" id="searchGrid" style="margin-bottom:0"></div>
+      </div>
 
       <h2>FAVORIT</h2>
       <div class="grid" id="favGrid"></div>
@@ -160,21 +138,6 @@
 <script>
   const MAKS_REKOMENDASI = 0;
   let REKOMENDASI_IDS = [1, 2, 3, 4, 5]; // ID awal resep bawaan
-
-  // ============================================================
-  //  PENGATURAN CAROUSEL  (silakan ubah bagian ini)
-  //  - gambar : alamat gambar, mis. "img/banner1.jpg" atau URL penuh.
-  //             Kosongkan ("") untuk memakai gambar placeholder.
-  //  - judul  : teks besar di atas gambar (boleh dikosongkan)
-  //  - teks   : teks kecil di bawah judul (boleh dikosongkan)
-  //  Tambah / hapus slide dengan menambah / menghapus satu baris { ... }.
-  // ============================================================
-  const CAROUSEL_INTERVAL = 4000; // jeda pindah otomatis (milidetik), 4000 = 4 detik
-  const CAROUSEL_SLIDES = [
-    { gambar: "https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcRGZpp_SDYPIcjRNpfQ3qjBhATIiof3ln5s3yMNSUvx2v4rIdMo_ABchfV1u8YTuEI8lulJiFxWIKsz5L0", judul: "Nasi Goreng Spesial"},
-    { gambar: "https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcRt8we5y5Pj55ra_s4rzkGiLFMoEXmex1R7bQA3LjRfnuYvYY2matPSv23mlTIIjZJAcT195iCOfTWQBSY", judul: "Ayam Rendang"},
-    { gambar: "https://encrypted-tbn3.gstatic.com/licensed-image?q=tbn:ANd9GcS9bqcCcjofKJ9DevAZdmryuiLmN4uGmharpXgGOMDwnyS9lqhNW95Zx5HfW7KuV3hQXZw-xIJ5THjGOIs", judul: "Risol Kentang"}
-  ];
 
   // ===== KLIEN SUPABASE =====
   const SUPABASE_URL = 'https://vdvlymemoqkgdpzgndhr.supabase.co';
@@ -282,7 +245,36 @@
       rg.innerHTML = '<p class="empty">Belum ada rekomendasi resep.</p>';
     }
     rek.forEach(r => rg.appendChild(kartu(r)));
+
+    renderPencarian();
   }
+
+  // ===== Pencarian resep (nama, kategori, bahan) =====
+  function renderPencarian(){
+    const q = $("kolomCari").value.toLowerCase().trim();
+    const box = $("hasilCari"), g = $("searchGrid");
+    if(!q){ box.hidden = true; g.innerHTML = ""; return; }
+
+    const hasil = RESEP.filter(r => {
+      const bahan = Array.isArray(r.bahan) ? r.bahan.join(" ") : String(r.bahan ?? "");
+      return [r.nama, r.kat, bahan].some(t => String(t ?? "").toLowerCase().includes(q));
+    });
+
+    $("judulHasil").textContent = `HASIL PENCARIAN (${hasil.length})`;
+    g.innerHTML = "";
+    if(!hasil.length){
+      g.innerHTML = `<p class="empty">Tidak ada resep yang cocok dengan "${esc(q)}".</p>`;
+    }
+    hasil.forEach(r => g.appendChild(kartu(r)));
+    box.hidden = false;
+  }
+
+  $("kolomCari").addEventListener("input", renderPencarian);
+  $("formCariResep").addEventListener("submit", e => {
+    e.preventDefault();
+    renderPencarian();
+    if(!$("hasilCari").hidden) $("hasilCari").scrollIntoView({behavior:"smooth", block:"nearest"});
+  });
 
   $("logoBtn").addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
 
@@ -335,82 +327,6 @@
   modal.addEventListener("click", e => {
     if(e.target === modal) modal.close();
   });
-
-  // ===== CAROUSEL =====
-  (function(){
-    const root = $("carousel"), track = $("crTrack"), dots = $("crDots");
-    const slides = CAROUSEL_SLIDES;
-    if(!slides.length){ root.style.display = "none"; return; }
-
-    const WARNA = ["#F4B183", "#E89149", "#F8CBAD", "#D9895A"];
-    function placeholder(n){
-      return "data:image/svg+xml;utf8," + encodeURIComponent(
-        '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="450">' +
-        '<rect width="100%" height="100%" fill="' + WARNA[n % WARNA.length] + '"/>' +
-        '<text x="50%" y="46%" fill="#fff" font-family="Arial" font-size="44" font-weight="700" text-anchor="middle">Placeholder ' + (n + 1) + '</text>' +
-        '<text x="50%" y="58%" fill="#fff" font-family="Arial" font-size="22" text-anchor="middle">Ganti gambar di CAROUSEL_SLIDES</text></svg>'
-      );
-    }
-
-    track.innerHTML = slides.map((s, i) => `
-      <div class="cr-slide" role="group" aria-roledescription="slide" aria-label="${i + 1} dari ${slides.length}">
-        <img src="${esc(s.gambar || placeholder(i))}" alt="${esc(s.judul || 'Slide ' + (i + 1))}">
-        ${(s.judul || s.teks) ? `<div class="cr-cap">${s.judul ? `<h3>${esc(s.judul)}</h3>` : ""}${s.teks ? `<p>${esc(s.teks)}</p>` : ""}</div>` : ""}
-      </div>`).join("");
-
-    // Jika gambar gagal dimuat, pakai placeholder
-    track.querySelectorAll("img").forEach((img, i) => {
-      img.addEventListener("error", () => { img.src = placeholder(i); }, {once:true});
-    });
-
-    dots.innerHTML = slides.map((_, i) =>
-      `<button type="button" class="cr-dot" data-i="${i}" aria-label="Ke slide ${i + 1}"></button>`).join("");
-
-    let idx = 0, timer = null;
-
-    function tampil(n){
-      idx = (n + slides.length) % slides.length;
-      track.style.transform = `translateX(-${idx * 100}%)`;
-      dots.querySelectorAll(".cr-dot").forEach((d, i) => d.classList.toggle("aktif", i === idx));
-    }
-    function mulai(){
-      berhenti();
-      if(slides.length > 1 && !matchMedia("(prefers-reduced-motion: reduce)").matches){
-        timer = setInterval(() => tampil(idx + 1), CAROUSEL_INTERVAL);
-      }
-    }
-    function berhenti(){ if(timer){ clearInterval(timer); timer = null; } }
-
-    $("crPrev").addEventListener("click", () => { tampil(idx - 1); mulai(); });
-    $("crNext").addEventListener("click", () => { tampil(idx + 1); mulai(); });
-    dots.addEventListener("click", e => {
-      const d = e.target.closest(".cr-dot");
-      if(d){ tampil(+d.dataset.i); mulai(); }
-    });
-
-    // Jeda saat kursor di atas carousel / fokus keyboard, lanjut saat keluar
-    root.addEventListener("mouseenter", berhenti);
-    root.addEventListener("mouseleave", mulai);
-    root.addEventListener("focusin", berhenti);
-    root.addEventListener("focusout", mulai);
-    document.addEventListener("visibilitychange", () => document.hidden ? berhenti() : mulai());
-
-    // Geser di layar sentuh
-    let x0 = null;
-    root.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; }, {passive:true});
-    root.addEventListener("touchend", e => {
-      if(x0 === null) return;
-      const dx = e.changedTouches[0].clientX - x0;
-      if(Math.abs(dx) > 40){ tampil(idx + (dx < 0 ? 1 : -1)); mulai(); }
-      x0 = null;
-    });
-
-    if(slides.length < 2){
-      $("crPrev").style.display = $("crNext").style.display = dots.style.display = "none";
-    }
-    tampil(0);
-    mulai();
-  })();
 
   // Inisialisasi awal
   muatData().then(() => {
