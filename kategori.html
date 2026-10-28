@@ -407,9 +407,6 @@
 
         <h3 class="judul-riwayat">Pencarian sebelumnya</h3>
         <ul class="riwayat" id="daftarRiwayat">
-          <li><a href="#">Ayam</a></li>
-          <li><a href="#">Cemilan</a></li>
-          <li><a href="#">Cepat Saji</a></li>
         </ul>
       </section>
 
@@ -440,26 +437,18 @@
 </footer>
 
 <script>
-  // ===== 1. INISIALISASI SUPABASE KREDENSIAL =====
-  const SUPABASE_URL = "https://vdvlymemoqkgdpzgndhr.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_-xh3JEbtYgQ5ERgIf3VWGg_L5ETk7_d";
-
-  // Perbaikan: Gunakan destructuring dari window.supabase agar variabel tidak bentrok
-  const { createClient } = window.supabase;
-  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
   const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
-  // Element DOM
-  const kolomCari = $("kolom-cari");
-  const formCari = $("formCari");
-  const gridKategori = $("gridKategori");
-  const daftarRiwayat = $("daftarRiwayat");
-  const btnSemuaKategori = $("btnSemuaKategori");
+  // ===== KLIEN SUPABASE =====
+  const SUPABASE_URL = 'https://vdvlymemoqkgdpzgndhr.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_-xh3JEbtYgQ5ERgIf3VWGg_L5ETk7_d';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // ===== NAVIGASI LOGO & USER MENU =====
+  // Klik logo: kembali ke dashboard
   $("logoBtn").addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
 
+  // ===== Menu pengguna =====
   const userBtn = $("userBtn"), userMenu = $("userMenu");
   if(userBtn && userMenu) {
     userBtn.addEventListener("click", e => {
@@ -486,79 +475,240 @@
     });
   }
 
-  // ===== AMBIL DATA KATEGORI DARI SUPABASE =====
-  async function loadKategoriFromSupabase() {
-    try {
-      // Coba ambil kategori + hitung resep
-      let { data, error } = await supabaseClient
-        .from('kategori')
-        .select(`
-          id,
-          nama,
-          resep ( count )
-        `);
+  // ===== Penyimpanan Lokal Resep Pengguna & Favorit =====
+  const KUNCI_RESEP   = "resepSaya";
+  const KUNCI_FAVORIT = "favorit";
 
-      // Fallback: Jika tabel 'resep' belum ada/terhubung, ambil data kategori saja
-      if (error) {
-        console.warn("Mencoba query sederhana (tanpa join resep)...");
-        const fallbackRes = await supabaseClient
-          .from('kategori')
-          .select('id, nama');
-        
-        if (fallbackRes.error) throw fallbackRes.error;
-        data = fallbackRes.data;
-      }
+  function bacaResepLokal(){
+    try{
+      const d = JSON.parse(localStorage.getItem(KUNCI_RESEP));
+      return Array.isArray(d) ? d : [];
+    }catch(e){ return []; }
+  }
 
-      renderKategoriGrid(data);
-    } catch (err) {
-      console.error("Gagal mengambil data dari Supabase:", err);
-      gridKategori.innerHTML = `<li class="pesan-kosong">Gagal memuat data kategori.<br><small>${err.message || ''}</small></li>`;
+  function simpanResepLokal(){
+    try{
+      localStorage.setItem(KUNCI_RESEP, JSON.stringify(daftarResep));
+      return true;
+    }catch(e){
+      console.warn("LocalStorage penuh, foto mungkin terlalu besar untuk disimpan secara lokal.", e);
+      return false;
     }
   }
 
-  // Render HTML Grid berdasarkan Data Supabase
-  function renderKategoriGrid(kategoriList) {
+  function bacaFavorit(){
+    try{
+      const d = JSON.parse(localStorage.getItem(KUNCI_FAVORIT));
+      if(Array.isArray(d)) return d;
+    }catch(e){}
+    return [1,2,3,4,5];
+  }
+
+  function simpanFavorit(arr){
+    try{ localStorage.setItem(KUNCI_FAVORIT, JSON.stringify(arr)); }catch(e){}
+  }
+
+  // ===== Resep Pengguna (Daftar Lokal) =====
+  let daftarResep = bacaResepLokal();
+
+  // ===== Data Resep Bawaan =====
+  let RESEP = [
+    {id:1, nama:"Nasi Goreng Spesial", kat:"Hidangan Utama", waktu:"20 menit", porsi:"2 porsi",
+     gambar:"img/nasi-goreng.jpg",
+     bahan:["2 piring nasi putih","2 butir telur","3 siung bawang putih","2 siung bawang merah","2 sdm kecap manis","Garam & merica secukupnya","Daun bawang, irisan"],
+     langkah:["Haluskan bawang putih dan bawang merah, lalu tumis hingga harum.","Masukkan telur, orak-arik hingga matang.","Tambahkan nasi, kecap, garam, dan merica. Aduk rata.","Taburi daun bawang, sajikan hangat."]},
+    {id:2, nama:"Ayam Rendang", kat:"Hidangan Utama", waktu:"60 menit", porsi:"4 porsi",
+     gambar:"img/ayam-rendang.jpg",
+     bahan:["500 g ayam, potong","400 ml santan","2 lembar daun jeruk","1 batang serai, memarkan","Bumbu halus: bawang merah, bawang putih, cabai, jahe, lengkuas, kunyit"],
+     langkah:["Tumis bumbu halus bersama serai dan daun jeruk hingga harum.","Masukkan ayam, aduk hingga berubah warna.","Tuang santan, masak dengan api kecil sambil sesekali diaduk.","Masak hingga kuah mengental dan bumbu meresap."]},
+    {id:3, nama:"Risol Kentang", kat:"Cemilan", waktu:"45 menit", porsi:"10 buah",
+     gambar:"img/risol-kentang.jpg",
+     bahan:["3 buah kentang, kukus lalu haluskan","10 lembar kulit risol","1 sdm margarin","Garam, merica, pala secukupnya","Tepung roti untuk melapisi"],
+     langkah:["Campur kentang halus dengan margarin, garam, merica, dan pala.","Isi kulit risol dengan adonan, lipat rapat.","Celupkan ke adonan tepung, lalu gulingkan pada tepung roti.","Goreng hingga kuning keemasan."]},
+    {id:4, nama:"Udang Balado", kat:"Cemilan", waktu:"25 menit", porsi:"3 porsi",
+     gambar:"img/udang-balado.jpg",
+     bahan:["300 g udang, bersihkan","8 cabai merah","3 siung bawang putih","3 siung bawang merah","1 buah tomat","Garam, gula, dan perasan jeruk nipis"],
+     langkah:["Goreng udang sebentar hingga setengah matang, angkat.","Haluskan cabai, bawang, dan tomat, lalu tumis hingga matang.","Masukkan udang, tambahkan garam, gula, dan jeruk nipis.","Aduk rata dan masak hingga bumbu meresap."]},
+    {id:5, nama:"Gulai Pakis", kat:"Sayuran", waktu:"30 menit", porsi:"4 porsi",
+     gambar:"img/gulai-pakis.jpg",
+     bahan:["250 g pakis, potong-potong","300 ml santan","2 lembar daun salam","1 batang serai","Bumbu halus: bawang merah, bawang putih, kunyit, cabai, kemiri"],
+     langkah:["Tumis bumbu halus bersama salam dan serai hingga harum.","Masukkan pakis, aduk sebentar.","Tuang santan dan masak dengan api kecil hingga pakis empuk.","Koreksi rasa, sajikan."]},
+    {id:6, nama:"Pindang Serani Kuah Kuning", kat:"Hidangan Utama", waktu:"40 menit", porsi:"4 porsi",
+     gambar:"img/pindang-serani.jpg",
+     bahan:["1 ekor ikan serani, potong","1 ruas kunyit","3 buah cabai rawit","2 batang serai","1 buah tomat","Belimbing wuluh atau asam jawa","Garam secukupnya"],
+     langkah:["Rebus air bersama serai dan bumbu halus hingga mendidih.","Masukkan ikan, masak dengan api sedang.","Tambahkan tomat, cabai rawit, dan belimbing wuluh.","Masak hingga ikan matang dan kuah beraroma segar."]},
+    {id:7, nama:"Bolu Coklat Lumer", kat:"Makanan Penutup", waktu:"50 menit", porsi:"8 potong",
+     gambar:"img/bolu-coklat.jpg",
+     bahan:["150 g tepung terigu","100 g gula pasir","3 butir telur","100 g dark chocolate","100 g mentega","1 sdt baking powder"],
+     langkah:["Lelehkan coklat dan mentega, dinginkan sebentar.","Kocok telur dan gula hingga mengembang.","Masukkan tepung dan baking powder, lalu campurkan lelehan coklat.","Panggang pada suhu 170°C selama 25–30 menit."]},
+    {id:8, nama:"Asem Bandeng Tradisional", kat:"Hidangan Utama", waktu:"45 menit", porsi:"4 porsi",
+     gambar:"img/asem-bandeng.jpg",
+     bahan:["1 ekor ikan bandeng","3 buah tomat hijau","5 buah cabai rawit","2 batang serai","Asam jawa secukupnya","Bawang merah dan bawang putih"],
+     langkah:["Didihkan air bersama bawang, serai, dan asam jawa.","Masukkan ikan bandeng yang sudah dibersihkan.","Tambahkan tomat dan cabai rawit.","Masak hingga ikan matang dan kuah terasa segar asam."]},
+    {id:9, nama:"Nasi Gudeg", kat:"Hidangan Utama", waktu:"120 menit", porsi:"5 porsi",
+     gambar:"img/nasi-gudeg.jpg",
+     bahan:["500 g nangka muda","500 ml santan","3 lembar daun salam","Gula merah secukupnya","Telur rebus & ayam opsional","Bumbu halus: bawang merah, bawang putih, kemiri, ketumbar"],
+     langkah:["Rebus nangka muda hingga agak empuk, tiriskan.","Tumis bumbu halus, masukkan nangka dan daun salam.","Tuang santan dan gula merah, masak dengan api kecil.","Masak lama hingga kuah menyusut dan warna kecokelatan."]},
+    {id:10, nama:"Martabak Keju", kat:"Makanan Penutup", waktu:"40 menit", porsi:"4 potong",
+     gambar:"img/martabak-keju.jpg",
+     bahan:["250 g tepung terigu","1 sdt ragi instan","1 butir telur","250 ml air","Keju parut","Susu kental manis","Mentega"],
+     langkah:["Campur tepung, ragi, telur, dan air; diamkan 30 menit.","Tuang adonan ke teflon, masak hingga berlubang di permukaan.","Olesi mentega, taburi keju dan susu kental manis.","Lipat, potong, dan sajikan hangat."]}
+  ];
+
+  // Element DOM
+  const kolomCari = $("kolom-cari");
+  const formCari = $("formCari");
+  const gridKategori = $("gridKategori");
+  const daftarRiwayat = $("daftarRiwayat");
+  const btnSemuaKategori = $("btnSemuaKategori");
+
+  // ===== BATAS TAMPILAN KATEGORI =====
+  const BATAS_AWAL = 15;
+  let tampilSemua = false;
+
+  // ===== Daftar Kategori Bawaan =====
+  const KATEGORI_DEFAULT = [
+    "Hidangan Utama",
+    "Sarapan",
+    "Cemilan",
+    "Sayuran",
+    "Makanan Penutup",
+    "Ayam",
+    "Nasi",
+    "Seafood",
+    "Mie",
+    "Sup",
+    "Ikan"
+  ];
+
+  // ===== Ambil Seluruh Resep (Supabase + Lokal + Default) =====
+  function ambilSemuaResep() {
+    daftarResep = bacaResepLokal();
+    const map = new Map();
+    [...RESEP, ...daftarResep].forEach(r => {
+      if (r && r.id != null && !map.has(r.id)) {
+        map.set(r.id, r);
+      }
+    });
+    return Array.from(map.values());
+  }
+
+  // ===== Hitung Jumlah Resep Sesuai Kategori =====
+  function hitungResepKategori(namaKat, daftarSemuaResep) {
+    const k = namaKat.toLowerCase().trim();
+    return daftarSemuaResep.filter(r => {
+      if(!r) return false;
+      const katResep = String(r.kat || "").toLowerCase().trim();
+      const namaResep = String(r.nama || "").toLowerCase();
+      return katResep === k || (k.length > 2 && namaResep.includes(k));
+    }).length;
+  }
+
+  // ===== Render Grid Kategori =====
+  function renderKategoriGrid(kategoriDariDB = []) {
     gridKategori.innerHTML = "";
 
-    if (!kategoriList || kategoriList.length === 0) {
+    const semuaResep = ambilSemuaResep();
+    const setKategori = new Set();
+
+    // 1. Kategori dari tabel database Supabase (jika ada)
+    if (Array.isArray(kategoriDariDB) && kategoriDariDB.length > 0) {
+      kategoriDariDB.forEach(item => {
+        const nama = item.nama || item.nama_kategori;
+        if (nama) setKategori.add(nama.trim());
+      });
+    }
+
+    // 2. Kategori bawaan aplikasi
+    KATEGORI_DEFAULT.forEach(k => setKategori.add(k));
+
+    // 3. Kategori dari resep yang tersimpan di database dan lokal
+    semuaResep.forEach(r => {
+      if (r.kat && typeof r.kat === "string" && r.kat.trim()) {
+        setKategori.add(r.kat.trim());
+      }
+    });
+
+    const daftarKategori = Array.from(setKategori);
+
+    if (daftarKategori.length === 0) {
       gridKategori.innerHTML = '<li class="pesan-kosong">Belum ada data kategori di database.</li>';
       return;
     }
 
-    kategoriList.forEach(item => {
-      const jumlahResep = (item.resep && item.resep[0]) ? item.resep[0].count : 0;
+    daftarKategori.forEach(namaKat => {
+      const jumlahResep = hitungResepKategori(namaKat, semuaResep);
       const li = document.createElement("li");
       li.innerHTML = `
         <a href="#" class="kartu">
-          <span class="kartu-nama">${item.nama}</span>
+          <span class="kartu-nama">${esc(namaKat)}</span>
           <span class="kartu-jumlah">${jumlahResep} Resep</span>
         </a>
       `;
       gridKategori.appendChild(li);
     });
+
+    terapkanTampilan(); // batasi tampilan awal ke 15 kategori
   }
 
-  // ===== FITUR PENCARIAN & RIWAYAT =====
-  function filterKategori(keyword) {
-    const query = keyword.toLowerCase().trim();
-    const itemKategori = gridKategori.querySelectorAll("li:not(.pesan-kosong)");
-    let ketemu = false;
+  // ===== AMBIL DATA DARI SUPABASE (SESUAI DENGAN INDEX.HTML) =====
+  async function muatData() {
+    let kategoriDariDB = [];
 
-    itemKategori.forEach(li => {
-      const namaEl = li.querySelector(".kartu-nama");
-      if (namaEl) {
-        const namaKategori = namaEl.textContent.toLowerCase();
-        if (namaKategori.includes(query)) {
-          li.style.display = "";
-          ketemu = true;
-        } else {
-          li.style.display = "none";
+    try {
+      // 1. Coba ambil dari tabel kategori jika ada di database Supabase
+      try {
+        const { data: katData, error: katError } = await supabaseClient
+          .from('kategori')
+          .select('*')
+          .order('id', { ascending: true });
+
+        if (!katError && katData && katData.length > 0) {
+          kategoriDariDB = katData;
         }
+      } catch (errKat) {
+        // Abaikan jika tabel kategori belum dibuat di Supabase
       }
+
+      // 2. Ambil seluruh resep dari database Supabase (tabel 'resep')
+      const { data, error } = await supabaseClient
+        .from('resep')
+        .select('*')
+        .order('id', { ascending: false });
+
+      if (error) {
+        console.error("Error dari Supabase:", error);
+      } else if (data && data.length > 0) {
+        // Gabungkan resep dari Supabase ke array resep
+        RESEP = data;
+      }
+    } catch (e) {
+      console.warn("Gagal memuat dari Supabase, memakai data lokal.", e);
+    }
+
+    renderKategoriGrid(kategoriDariDB);
+  }
+
+  // ===== FITUR PENCARIAN, BATAS 15 KATEGORI & RIWAYAT =====
+  function terapkanTampilan() {
+    const query = kolomCari.value.toLowerCase().trim();
+    const items = gridKategori.querySelectorAll("li:not(.pesan-kosong)");
+    let jumlahCocok = 0;
+
+    items.forEach(li => {
+      const nama = (li.querySelector(".kartu-nama")?.textContent || "").toLowerCase();
+      const cocok = nama.includes(query);
+      if (cocok) jumlahCocok++;
+
+      // Saat mencari, tampilkan semua yang cocok.
+      // Saat tidak mencari, batasi 15 kecuali tombol "Semua Kategori" ditekan.
+      const dalamBatas = query !== "" || tampilSemua || jumlahCocok <= BATAS_AWAL;
+      li.style.display = (cocok && dalamBatas) ? "" : "none";
     });
 
+    // Pesan "tidak ditemukan"
     let pesanKosong = $("pesanKosong");
-    if (!ketemu) {
+    if (jumlahCocok === 0) {
       if (!pesanKosong) {
         pesanKosong = document.createElement("li");
         pesanKosong.id = "pesanKosong";
@@ -569,6 +719,15 @@
     } else if (pesanKosong) {
       pesanKosong.remove();
     }
+
+    // Teks & visibilitas tombol
+    btnSemuaKategori.style.display = items.length > BATAS_AWAL ? "" : "none";
+    btnSemuaKategori.textContent = tampilSemua ? "Tampilkan Lebih Sedikit" : "Semua Kategori";
+  }
+
+  // Dipertahankan agar pemanggilan lama tetap berfungsi
+  function filterKategori() {
+    terapkanTampilan();
   }
 
   function tambahRiwayat(keyword) {
@@ -609,16 +768,36 @@
     }
   });
 
+  // Tombol "Semua Kategori": tampilkan semua / kembali ke 15
   if(btnSemuaKategori) {
     btnSemuaKategori.addEventListener("click", e => {
       e.preventDefault();
-      kolomCari.value = "";
-      filterKategori("");
+      if (tampilSemua && kolomCari.value.trim() === "") {
+        tampilSemua = false;   // klik lagi: kembali ke 15 kategori
+      } else {
+        tampilSemua = true;    // tampilkan semua & hapus pencarian
+        kolomCari.value = "";
+      }
+      terapkanTampilan();
     });
   }
 
-  // Jalankan pemanggilan data saat halaman dimuat
-  loadKategoriFromSupabase();
+  // Klik kartu kategori untuk langsung memfilter
+  gridKategori.addEventListener("click", e => {
+    const kartu = e.target.closest(".kartu");
+    if (kartu) {
+      e.preventDefault();
+      const nama = kartu.querySelector(".kartu-nama")?.textContent;
+      if (nama) {
+        kolomCari.value = nama;
+        filterKategori(nama);
+        tambahRiwayat(nama);
+      }
+    }
+  });
+
+  // Inisialisasi awal saat halaman dimuat
+  muatData();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
