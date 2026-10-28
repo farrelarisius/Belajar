@@ -4,7 +4,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dashboard</title>
+<title>Perencanaan</title>
+<!-- Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" >
 <link rel="stylesheet" href="perencanaan.css">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
@@ -160,6 +162,31 @@
     padding:10px 0
   }
 
+  /* CSS TAMBAHAN PERENCANAAN */
+  .pilih-hari, .pilih-menu{
+    padding:6px 10px; border:1px solid #E89149; border-radius:6px;
+    color: black;
+    background:#fff; font-size:14px;
+  }
+  .kontrol-jadwal{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+  .kartu-menu .hapus-menu{
+    margin-left:10px; border:0; background:none; color:#d90000;
+    font-weight:700; cursor:pointer;
+  }
+  .menu-kosong{font-size:14px; padding:8px 0; list-style:none}
+
+  .tersimpan{margin-top:30px}
+  .tersimpan-isi{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; margin-top:12px}
+  .kartu-rencana{background:#FEE8D6; border-radius:14px; padding:16px; font-size:14px}
+  .kartu-rencana h3{font-size:15px; margin-bottom:8px}
+  .kartu-rencana h4{font-size:13px; margin:10px 0 4px}
+  .kartu-rencana ul{margin:0; padding-left:18px}
+  .kartu-rencana .total-rencana{margin-top:10px; font-weight:700}
+  .kartu-rencana .hapus-rencana{
+    margin-top:10px; border:0; border-radius:6px; padding:6px 12px;
+    background:#d90000; color:#fff; cursor:pointer;
+  }
+
 
   /* TENTANG KAMI / FOOTER */
   .about{
@@ -249,7 +276,7 @@
   
 <!-- NAVBAR -->
 <header class="navbar" id="top">
-  <button class="logo-btn" id="logoBtn" aria-label="Kembali ke dashboard"><img src="Logo-Aplikasi.png" width="40px" height="40px"></button>
+  <button class="logo-btn" id="logoBtn" aria-label="Kembali ke dashboard"><img src="Logo-Aplikasi.png" width="40px" height="40px" alt="Logo Aplikasi"></button>
   <nav class="nav-right">
     <ul class="nav-links">
       <li><a href="index.html">Dashboard</a></li>
@@ -286,16 +313,17 @@
       <div class="jadwal-isi">
         <div class="jadwal-kepala">
           <h2 class="label-jadwal">*Jadwal*</h2>
-          <button type="button" class="tombol-tambah-menu">Tambah Menu</button>
+          <div class="kontrol-jadwal">
+            <select id="pilihHari" class="pilih-hari" aria-label="Pilih hari">
+              <option>Senin</option><option>Selasa</option><option>Rabu</option>
+              <option>Kamis</option><option>Jumat</option><option>Sabtu</option><option>Minggu</option>
+            </select>
+            <select id="pilihMenu" class="pilih-menu" aria-label="Pilih menu"></select>
+            <button type="button" class="tombol-tambah-menu" id="btnTambahMenu">Tambah Menu</button>
+          </div>
         </div>
 
-        <ul class="daftar-menu">
-          <li class="kartu-menu"><span>Nasi Goreng</span></li>
-          <li class="kartu-menu"><span>Ikan Bakar</span></li>
-          <li class="kartu-menu"><span>Pecel lele</span></li>
-          <li class="kartu-menu"><span>Ayam Sambal</span></li>
-          <li class="kartu-menu"><span>Bebek gulai</span></li>
-        </ul>
+        <ul class="daftar-menu" id="daftarMenu"></ul>
       </div>
     </section>
 
@@ -350,6 +378,12 @@
           <button type="submit" class="tombol-simpan">Simpan</button>
         </div>
       </form>
+    </section>
+
+    <!-- Section Rencana Tersimpan -->
+    <section class="tersimpan" aria-labelledby="judul-tersimpan">
+      <h2 id="judul-tersimpan" class="bar-judul bar-judul-kecil">Rencana Tersimpan</h2>
+      <div class="tersimpan-isi" id="daftarTersimpan"></div>
     </section>
 
   </div>
@@ -415,49 +449,69 @@
     return div;
   }
 
-
   function renderDashboard(){
-    const fg = $("favGrid"); fg.innerHTML = "";
-    const daftar = RESEP.filter(r => favorit.includes(r.id));
-    if(!daftar.length){
-      fg.innerHTML = '<p class="empty">Belum ada resep favorit. Buka menu Kategori lalu tekan ikon hati pada resep.</p>';
+    const fg = $("favGrid"); 
+    if(fg){
+      fg.innerHTML = "";
+      const daftar = RESEP.filter(r => favorit.includes(r.id));
+      if(!daftar.length){
+        fg.innerHTML = '<p class="empty">Belum ada resep favorit. Buka menu Kategori lalu tekan ikon hati pada resep.</p>';
+      }
+      daftar.forEach(r => fg.appendChild(kartu(r, {heartStatis:true})));
     }
-    daftar.forEach(r => fg.appendChild(kartu(r, {heartStatis:true})));
 
-    const rg = $("recGrid"); rg.innerHTML = "";
-    RESEP.filter(r => REKOMENDASI.includes(r.id)).forEach(r => rg.appendChild(kartu(r)));
+    const rg = $("recGrid");
+    if(rg){
+      rg.innerHTML = "";
+      RESEP.filter(r => REKOMENDASI.includes(r.id)).forEach(r => rg.appendChild(kartu(r)));
+    }
   }
 
   // Klik logo: scroll otomatis ke atas (kembali ke dashboard)
-  $("logoBtn").addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
+  const logoBtn = $("logoBtn");
+  if(logoBtn){
+    logoBtn.addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
+  }
 
   // ===== Menu pengguna (Pengaturan & Logout) =====
   const userBtn = $("userBtn"), userMenu = $("userMenu");
-  userBtn.addEventListener("click", e => {
-    e.stopPropagation();
-    const buka = userMenu.classList.toggle("show");
-    userBtn.setAttribute("aria-expanded", buka);
-  });
-  document.addEventListener("click", () => {
-    userMenu.classList.remove("show");
-    userBtn.setAttribute("aria-expanded", false);
-  });
-  $("menuSettings").addEventListener("click", e => { e.preventDefault(); alert("Halaman Pengaturan (dalam pengembangan)."); });
-  $("menuLogout").addEventListener("click", e => {
-    e.preventDefault();
-    if(confirm("Yakin ingin logout?")){
-      setTimeout(() => (location.href = "login.html"), 1000);
-      alert("Anda telah logout.");
-    }
-  });
+  if(userBtn && userMenu){
+    userBtn.addEventListener("click", e => {
+      e.stopPropagation();
+      const buka = userMenu.classList.toggle("show");
+      userBtn.setAttribute("aria-expanded", buka);
+    });
+    document.addEventListener("click", () => {
+      userMenu.classList.remove("show");
+      userBtn.setAttribute("aria-expanded", false);
+    });
+  }
+
+  const menuSettings = $("menuSettings");
+  if(menuSettings){
+    menuSettings.addEventListener("click", e => { e.preventDefault(); alert("Halaman Pengaturan (dalam pengembangan)."); });
+  }
+
+  const menuLogout = $("menuLogout");
+  if(menuLogout){
+    menuLogout.addEventListener("click", e => {
+      e.preventDefault();
+      if(confirm("Yakin ingin logout?")){
+        setTimeout(() => (location.href = "login.html"), 1000);
+        alert("Anda telah logout.");
+      }
+    });
+  }
 
   // ===== Form Hubungi Kami =====
-  $("contactForm").addEventListener("submit", e => {
-    e.preventDefault();
-    $("formMsg").textContent = "Pesan terkirim. Terima kasih, " + $("cNama").value + "!";
-    e.target.reset();
-  });
-
+  const contactForm = $("contactForm");
+  if(contactForm){
+    contactForm.addEventListener("submit", e => {
+      e.preventDefault();
+      $("formMsg").textContent = "Pesan terkirim. Terima kasih, " + $("cNama").value + "!";
+      e.target.reset();
+    });
+  }
 
   // Menu yang belum tersedia
   document.querySelectorAll(".soon").forEach(a => a.addEventListener("click", e => {
@@ -466,6 +520,251 @@
   }));
 
   renderDashboard();
+</script>
+
+<!-- Logika Interaktif Perencanaan Tambahan -->
+<script>
+(function(){
+  const HARI = ["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"];
+  const KUNCI = "rencanaMingguan";
+  const q = s => document.querySelector(s);
+
+  // ---------- Inisialisasi Supabase ----------
+  const SUPABASE_URL = 'https://vdvlymemoqkgdpzgndhr.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_-xh3JEbtYgQ5ERgIf3VWGg_L5ETk7_d';
+  const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+  // ---------- 1. Data menu (database & fallback) ----------
+  const MENU_CADANGAN = [
+    {id:1, nama:"Nasi Goreng Spesial", kat:"Hidangan Utama"},
+    {id:2, nama:"Ayam Rendang", kat:"Hidangan Utama"},
+    {id:3, nama:"Risol Kentang", kat:"Cemilan"},
+    {id:4, nama:"Udang Balado", kat:"Cemilan"},
+    {id:5, nama:"Gulai Pakis", kat:"Sayuran"},
+    {id:6, nama:"Pindang Serani Kuah Kuning", kat:"Hidangan Utama"},
+    {id:7, nama:"Bolu Coklat Lumer", kat:"Makanan Penutup"},
+    {id:8, nama:"Asem Bandeng Tradisional", kat:"Hidangan Utama"},
+    {id:9, nama:"Nasi Gudeg", kat:"Hidangan Utama"},
+    {id:10, nama:"Martabak Keju", kat:"Makanan Penutup"}
+  ];
+  let menuDB = [];
+
+  async function muatData() {
+    if (!supabaseClient) return null;
+    try {
+      const { data, error } = await supabaseClient
+        .from('resep')
+        .select('*')
+        .order('id', { ascending: false });
+
+      if (error) {
+        console.error("Error dari Supabase:", error);
+        return null;
+      }
+      return data;
+    } catch (e) {
+      console.warn("Gagal memuat dari Supabase, memakai data lokal.", e);
+      return null;
+    }
+  }
+
+  async function muatMenu(){
+    const dataSupabase = await muatData();
+    if (dataSupabase && dataSupabase.length > 0) {
+      menuDB = dataSupabase;
+    } else {
+      menuDB = MENU_CADANGAN;
+    }
+
+    const selMenu = q("#pilihMenu");
+    if(selMenu){
+      selMenu.innerHTML = menuDB
+        .map(m => `<option value="${m.id}">${esc(m.nama || m.title || "Menu")}</option>`).join("");
+    }
+  }
+
+  // ---------- Util ----------
+  function esc(t){
+    return String(t).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+  const angka = v => parseInt(String(v).replace(/\D/g,""), 10) || 0;
+  const rupiah = n => "Rp " + n.toLocaleString("id-ID");
+
+  // ---------- 2. Pilih hari + tambah menu ----------
+  let jadwal = {};
+  HARI.forEach(h => jadwal[h] = []);
+
+  function renderMenu(){
+    const elHari = q("#pilihHari");
+    const ul = q("#daftarMenu");
+    if(!elHari || !ul) return;
+    
+    const hari = elHari.value;
+    const isi = jadwal[hari];
+    if(!isi.length){
+      ul.innerHTML = `<li class="menu-kosong">Belum ada menu untuk hari ${hari}.</li>`;
+      return;
+    }
+    ul.innerHTML = isi.map((nama,i) =>
+      `<li class="kartu-menu"><span>${esc(nama)}</span>
+       <button type="button" class="hapus-menu" data-i="${i}" aria-label="Hapus ${esc(nama)}">&times;</button></li>`
+    ).join("");
+  }
+
+  const elPilihHari = q("#pilihHari");
+  if(elPilihHari) elPilihHari.addEventListener("change", renderMenu);
+
+  const btnTambah = q("#btnTambahMenu");
+  if(btnTambah){
+    btnTambah.addEventListener("click", () => {
+      const sel = q("#pilihMenu");
+      if(!sel || !sel.value) return;
+      const nama = sel.options[sel.selectedIndex].text;
+      const hari = q("#pilihHari").value;
+      if(jadwal[hari].includes(nama)){ alert(nama + " sudah ada di hari " + hari + "."); return; }
+      jadwal[hari].push(nama);
+      renderMenu();
+    });
+  }
+
+  const ulDaftar = q("#daftarMenu");
+  if(ulDaftar){
+    ulDaftar.addEventListener("click", e => {
+      const b = e.target.closest(".hapus-menu");
+      if(!b) return;
+      jadwal[q("#pilihHari").value].splice(+b.dataset.i, 1);
+      renderMenu();
+    });
+  }
+
+  // ---------- 3. Daftar bahan + total harga ----------
+  const form = q(".belanja form");
+
+  if(form){
+    // tombol "+" menambah baris baru pada panelnya
+    form.querySelectorAll(".tombol-plus").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const panel = btn.closest(".panel");
+        const barisAda = panel.querySelectorAll(".baris");
+        const n = barisAda.length + 1;
+        const contoh = barisAda[0].querySelectorAll("input");
+        const awal = contoh[0].name.replace(/\d+$/,"");
+        const awalHarga = contoh[1].name.replace(/\d+$/,"");
+        const div = document.createElement("div");
+        div.className = "baris";
+        div.innerHTML =
+          `<input type="text" name="${awal}${n}" aria-label="Bahan ${n}">` +
+          `<input type="text" name="${awalHarga}${n}" aria-label="Harga ${n}" inputmode="numeric">`;
+        panel.insertBefore(div, btn);
+        div.querySelector("input").focus();
+      });
+    });
+
+    function hitungTotal(){
+      let total = 0;
+      form.querySelectorAll("fieldset.panel .baris").forEach(b => {
+        total += angka(b.querySelectorAll("input")[1].value);
+      });
+      const elTotal = form.querySelector(".nilai-total");
+      if(elTotal) elTotal.textContent = rupiah(total);
+      return total;
+    }
+
+    form.addEventListener("input", e => {
+      if(e.target.inputMode === "numeric" || /^harga/.test(e.target.name)) hitungTotal();
+    });
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const adaMenu = HARI.some(h => jadwal[h].length);
+      const belanja = kumpulBelanja();
+      if(!adaMenu && !belanja.length){ alert("Isi jadwal menu atau daftar belanja terlebih dahulu."); return; }
+
+      const data = ambil();
+      data.unshift({
+        id: Date.now(),
+        tanggal: new Date().toLocaleString("id-ID", {dateStyle:"medium", timeStyle:"short"}),
+        jadwal: JSON.parse(JSON.stringify(jadwal)),
+        belanja,
+        total: hitungTotal()
+      });
+      simpan(data);
+
+      // reset form
+      form.querySelectorAll("input").forEach(i => i.value = "");
+      HARI.forEach(h => jadwal[h] = []);
+      const elTotal = form.querySelector(".nilai-total");
+      if(elTotal) elTotal.innerHTML = "&nbsp;";
+      renderMenu();
+      renderTersimpan();
+      const judulTersimpan = q("#judul-tersimpan");
+      if(judulTersimpan) judulTersimpan.scrollIntoView({behavior:"smooth"});
+    });
+  }
+
+  // ---------- 4. Simpan & tampilkan rencana ----------
+  function ambil(){
+    try{ return JSON.parse(localStorage.getItem(KUNCI)) || []; }catch(e){ return []; }
+  }
+  function simpan(data){
+    try{ localStorage.setItem(KUNCI, JSON.stringify(data)); }catch(e){ alert("Gagal menyimpan rencana."); }
+  }
+
+  function kumpulBelanja(){
+    const hasil = [];
+    if(!form) return hasil;
+    form.querySelectorAll("fieldset.panel").forEach(p => {
+      const kategori = p.querySelector("legend").textContent.trim();
+      p.querySelectorAll(".baris").forEach(b => {
+        const [nm, hg] = b.querySelectorAll("input");
+        if(nm.value.trim() || hg.value.trim()){
+          hasil.push({kategori, nama: nm.value.trim() || "(tanpa nama)", harga: angka(hg.value)});
+        }
+      });
+    });
+    return hasil;
+  }
+
+  function renderTersimpan(){
+    const box = q("#daftarTersimpan");
+    if(!box) return;
+    const data = ambil();
+    if(!data.length){
+      box.innerHTML = '<p class="menu-kosong">Belum ada rencana yang disimpan.</p>';
+      return;
+    }
+    box.innerHTML = data.map(r => {
+      const hariHtml = HARI.filter(h => r.jadwal[h] && r.jadwal[h].length)
+        .map(h => `<li><b>${h}:</b> ${r.jadwal[h].map(esc).join(", ")}</li>`).join("")
+        || "<li>Tidak ada menu</li>";
+      const bahanHtml = r.belanja.length
+        ? r.belanja.map(b => `<li>${esc(b.nama)} <small>(${esc(b.kategori)})</small> &ndash; ${rupiah(b.harga)}</li>`).join("")
+        : "<li>Tidak ada bahan</li>";
+      return `<article class="kartu-rencana">
+        <h3>Rencana ${esc(r.tanggal)}</h3>
+        <h4>Jadwal Masakan</h4><ul>${hariHtml}</ul>
+        <h4>Daftar Belanja</h4><ul>${bahanHtml}</ul>
+        <p class="total-rencana">Total: ${rupiah(r.total)}</p>
+        <button type="button" class="hapus-rencana" data-id="${r.id}">Hapus</button>
+      </article>`;
+    }).join("");
+  }
+
+  const boxTersimpan = q("#daftarTersimpan");
+  if(boxTersimpan){
+    boxTersimpan.addEventListener("click", e => {
+      const b = e.target.closest(".hapus-rencana");
+      if(!b || !confirm("Hapus rencana ini?")) return;
+      simpan(ambil().filter(r => String(r.id) !== b.dataset.id));
+      renderTersimpan();
+    });
+  }
+
+  // ---------- Mulai ----------
+  muatMenu();
+  renderMenu();
+  renderTersimpan();
+})();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
