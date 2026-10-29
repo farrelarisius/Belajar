@@ -525,6 +525,14 @@
   $("logoBtn").addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
 
   // ===== Menu pengguna =====
+  // ===== Cek Status Login Pengguna =====
+  function cekUserLogin(){
+    try{
+      const s = localStorage.getItem("currentUser");
+      return s ? JSON.parse(s) : null;
+    }catch(e){ return null; }
+  }
+
   const userBtn = $("userBtn"), userMenu = $("userMenu");
   if(userBtn && userMenu) {
     userBtn.addEventListener("click", e => {
@@ -538,6 +546,24 @@
     });
   }
 
+  function perbaruiStatusUser() {
+    const currentUser = cekUserLogin();
+    const span = userBtn ? userBtn.querySelector("span:not(.avatar)") : null;
+    const menuLogin = $("menuLogin");
+    const menuLogout = $("menuLogout");
+
+    if (currentUser) {
+      if (span) span.textContent = currentUser.nama || currentUser.username;
+      if (menuLogin) menuLogin.style.display = "none";
+      if (menuLogout) menuLogout.style.display = "block";
+    } else {
+      if (span) span.textContent = "Pengguna";
+      if (menuLogin) menuLogin.style.display = "block";
+      if (menuLogout) menuLogout.style.display = "none";
+    }
+  }
+  perbaruiStatusUser();
+
   if($("menuSettings")) {
     $("menuSettings").addEventListener("click", e => { e.preventDefault(); alert("Halaman Pengaturan (dalam pengembangan)."); });
   }
@@ -545,6 +571,8 @@
     $("menuLogout").addEventListener("click", e => {
       e.preventDefault();
       if(confirm("Yakin ingin logout?")){
+        localStorage.removeItem("currentUser");
+        perbaruiStatusUser();
         setTimeout(() => (location.href = "login.html"), 1000);
         alert("Anda telah logout.");
       }

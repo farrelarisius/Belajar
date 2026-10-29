@@ -176,7 +176,24 @@
     try{ localStorage.setItem("favorit", JSON.stringify(favorit)); }catch(e){}
   }
 
+  // ===== Cek Status Login Pengguna =====
+  function cekUserLogin(){
+    try{
+      const s = localStorage.getItem("currentUser");
+      return s ? JSON.parse(s) : null;
+    }catch(e){ return null; }
+  }
+
   function toggleFavorit(id) {
+    // Validasi registrasi/login sebelum menambahkan ke favorit
+    const currentUser = cekUserLogin();
+    if (!currentUser) {
+      if (confirm("Anda harus melakukan registrasi akun atau login terlebih dahulu untuk menambahkan resep ke favorit!\n\nBuka halaman registrasi sekarang?")) {
+        location.href = "form.html";
+      }
+      return;
+    }
+
     const index = favorit.indexOf(id);
     if (index > -1) {
       favorit.splice(index, 1);
@@ -282,23 +299,50 @@
 
   // Menu Pengguna
   const userBtn = $("userBtn"), userMenu = $("userMenu");
-  userBtn.addEventListener("click", e => {
-    e.stopPropagation();
-    const buka = userMenu.classList.toggle("show");
-    userBtn.setAttribute("aria-expanded", buka);
-  });
-  document.addEventListener("click", () => {
-    userMenu.classList.remove("show");
-    userBtn.setAttribute("aria-expanded", false);
-  });
-  $("menuSettings").addEventListener("click", e => { e.preventDefault(); alert("Halaman Pengaturan (dalam pengembangan)."); });
-  $("menuLogout").addEventListener("click", e => {
-    e.preventDefault();
-    if(confirm("Yakin ingin logout?")){
-      setTimeout(() => (location.href = "login.html"), 1000);
-      alert("Anda telah logout.");
+  if(userBtn && userMenu) {
+    userBtn.addEventListener("click", e => {
+      e.stopPropagation();
+      const buka = userMenu.classList.toggle("show");
+      userBtn.setAttribute("aria-expanded", buka);
+    });
+    document.addEventListener("click", () => {
+      userMenu.classList.remove("show");
+      userBtn.setAttribute("aria-expanded", false);
+    });
+  }
+
+  function perbaruiStatusUser() {
+    const currentUser = cekUserLogin();
+    const span = userBtn ? userBtn.querySelector("span:not(.avatar)") : null;
+    const menuLogin = $("menuLogin");
+    const menuLogout = $("menuLogout");
+
+    if (currentUser) {
+      if (span) span.textContent = currentUser.nama || currentUser.username;
+      if (menuLogin) menuLogin.style.display = "none";
+      if (menuLogout) menuLogout.style.display = "block";
+    } else {
+      if (span) span.textContent = "Pengguna";
+      if (menuLogin) menuLogin.style.display = "block";
+      if (menuLogout) menuLogout.style.display = "none";
     }
-  });
+  }
+  perbaruiStatusUser();
+
+  if($("menuSettings")) {
+    $("menuSettings").addEventListener("click", e => { e.preventDefault(); alert("Halaman Pengaturan (dalam pengembangan)."); });
+  }
+  if($("menuLogout")) {
+    $("menuLogout").addEventListener("click", e => {
+      e.preventDefault();
+      if(confirm("Yakin ingin logout?")){
+        localStorage.removeItem("currentUser");
+        perbaruiStatusUser();
+        setTimeout(() => (location.href = "login.html"), 1000);
+        alert("Anda telah logout.");
+      }
+    });
+  }
 
   // Modal Detail Resep
   const modal = $("resepModal");

@@ -578,6 +578,9 @@
 <main>
   <div class="page">
       <h1>PENCATATAN RESEP</h1>
+      <div id="peringatanLogin" style="display:none; background:#fff3cd; color:#856404; padding:12px 18px; border-radius:8px; margin-bottom:18px; border:1px solid #ffeeba; font-size:14px; line-height:1.5;">
+        <strong>Perhatian:</strong> Anda belum login. Silakan <a href="form.html" style="color:#d9534f; font-weight:bold; text-decoration:underline;">Registrasi Akun</a> atau <a href="login.html" style="color:#0275d8; font-weight:bold; text-decoration:underline;">Login</a> terlebih dahulu untuk mencatat resep.
+      </div>
       <form id="noteForm" class="note-wrap">
         <div class="panel">
           <label for="judul">Judul Resep</label>
@@ -666,8 +669,37 @@
   // Klik logo: kembali ke dashboard
   $("logoBtn").addEventListener("click", () => window.scrollTo({top:0, behavior:"smooth"}));
 
+  // ===== Cek Status Login Pengguna =====
+  function cekUserLogin(){
+    try{
+      const s = localStorage.getItem("currentUser");
+      return s ? JSON.parse(s) : null;
+    }catch(e){ return null; }
+  }
+
   // ===== Menu pengguna =====
   const userBtn = $("userBtn"), userMenu = $("userMenu");
+
+  function perbaruiStatusUser() {
+    const currentUser = cekUserLogin();
+    const span = userBtn ? userBtn.querySelector("span:not(.avatar)") : null;
+    const menuLogin = $("menuLogin");
+    const menuLogout = $("menuLogout");
+    const peringatan = $("peringatanLogin");
+
+    if (currentUser) {
+      if (span) span.textContent = currentUser.nama || currentUser.username;
+      if (menuLogin) menuLogin.style.display = "none";
+      if (menuLogout) menuLogout.style.display = "block";
+      if (peringatan) peringatan.style.display = "none";
+    } else {
+      if (span) span.textContent = "Pengguna";
+      if (menuLogin) menuLogin.style.display = "block";
+      if (menuLogout) menuLogout.style.display = "none";
+      if (peringatan) peringatan.style.display = "block";
+    }
+  }
+  perbaruiStatusUser();
   userBtn.addEventListener("click", e => {
     e.stopPropagation();
     const buka = userMenu.classList.toggle("show");
@@ -681,6 +713,8 @@
   $("menuLogout").addEventListener("click", e => {
     e.preventDefault();
     if(confirm("Yakin ingin logout?")){
+      localStorage.removeItem("currentUser");
+      perbaruiStatusUser();
       setTimeout(() => (location.href = "login.html"), 1000);
       alert("Anda telah logout.");
     }
@@ -892,6 +926,16 @@
   // ===== Simpan Resep =====
   $("noteForm").addEventListener("submit", async e => {
     e.preventDefault();
+
+    // Validasi login terlebih dahulu
+    const currentUser = cekUserLogin();
+    if (!currentUser) {
+      if (confirm("Anda harus melakukan registrasi akun atau login terlebih dahulu untuk mencatat resep!\n\nBuka halaman registrasi sekarang?")) {
+        location.href = "form.html";
+      }
+      return;
+    }
+
     const btnSimpan = $("btnSimpan");
     btnSimpan.disabled = true;
     btnSimpan.textContent = "Menyimpan...";
