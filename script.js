@@ -68,7 +68,7 @@ if (formRegistrasi) {
     if (!ok) return;
 
     btnDaftar.disabled = true;
-    btnDaftar.textContent = "Mendaftarkan ke Database...";
+    btnDaftar.textContent = "Registrasi Berhasil, Mengalihkan...";
 
     try {
       // 1. Cek apakah username sudah dipakai di database Supabase
